@@ -14,6 +14,7 @@
 
 #define UNLOCK_MENU             UNLOCK_BASE+21
 #define UNLOCK_LEVELHUD         UNLOCK_BASE+22
+#define UNLOCK_REPORT           UNLOCK_BASE+23
 
 #define LEVEL_ADDXP             UNLOCK_BASE+31
 #define LEVEL_RECALC            UNLOCK_BASE+32

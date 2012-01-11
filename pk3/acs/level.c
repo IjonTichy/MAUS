@@ -226,6 +226,23 @@ script UNLOCK_DISCONNECT (int pln) disconnect
     }
 }
 
+script UNLOCK_REPORT (void)
+{
+    SetHudSize(800, 600, 1);
+
+    int i; int j;
+    for (i = 0; i < 32; i++)
+    {
+        if (!PlayerInGame(i))
+        {
+            continue;
+        }
+        HudMessage(n:i+1, s:"\c- (unlocksLeft=", d:unlocksLeft[i], s:", level=", d:getStat(i, STAT_LEVEL), s:", XP=(", d:getStat(i, STAT_XP), s:", ", d:getStat(i, STAT_TOTALXP), s:"))";
+                    HUDMSG_PLAIN, UNLOCK_HBASE-1000+i, CR_WHITE, 200.1, 200.0 + ((j * 10) << 16), 5.0);
+        j++;
+    }
+}
+
 script UNLOCK_MENU (void)
 {
     int pln = PlayerNumber();
@@ -238,7 +255,6 @@ script UNLOCK_MENU (void)
     SetHudSize(640, 480, 1);
 
     uMenuLock[pln] = 1;
-    GiveInventory("SpawnStop", 1);
     GiveInventory("SpawnProtection", 1);
 
     int i; int tic; int selected; int oSelected; int left; int oLeft;
@@ -269,6 +285,8 @@ script UNLOCK_MENU (void)
             break;
         }
 
+        GiveInventory("SpawnStop", 1);
+        
         if (keyDown(BT_USE))
         {
             if (usekey == -1)
@@ -326,8 +344,6 @@ script UNLOCK_MENU (void)
         {
             downkey = 0;
         }
-
-        SetPlayerProperty(0, 1, PROP_FROZEN);
 
         left = unlocksLeft[pln];
         
