@@ -23,9 +23,9 @@
 #define MENU_REFRESH 70
 #define HUD_REFRESH  150
 
-#define MENU_USESPEED       6
-#define MENU_UPSPEED        4
-#define MENU_DOWNSPEED      4
+#define MENU_USESPEED       10
+#define MENU_UPSPEED        8
+#define MENU_DOWNSPEED      8
 
 #define AMMO_CLIPRATE       70
 #define AMMO_SHELLRATE      140

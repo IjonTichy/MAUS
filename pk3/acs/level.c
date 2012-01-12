@@ -126,6 +126,13 @@ function int checkUnlock(int pln, int num, int quiet)
 }
 
 
+function void giveHealth(int amount)
+{
+    int newHP = min(GetActorProperty(0, APROP_Health)+amount, GetActorProperty(0, APROP_SpawnHealth));
+    SetActorProperty(0, APROP_Health, newHP);
+}
+
+
 function int getStat(int pln, int which)
 {
     return startStats[(pln * STAT_COUNT) + which];
@@ -230,16 +237,26 @@ script UNLOCK_REPORT (void)
 {
     SetHudSize(800, 600, 1);
 
-    int i; int j;
+    int i; int j; int offs;
+    
+    int unlocksUsed;
+
     for (i = 0; i < 32; i++)
     {
         if (!PlayerInGame(i))
         {
             continue;
         }
-        HudMessage(n:i+1, s:"\c- (unlocksLeft=", d:unlocksLeft[i], s:", level=", d:getStat(i, STAT_LEVEL), s:", XP=(", d:getStat(i, STAT_XP), s:", ", d:getStat(i, STAT_TOTALXP), s:"))";
-                    HUDMSG_PLAIN, UNLOCK_HBASE-1000+i, CR_WHITE, 200.1, 200.0 + ((j * 10) << 16), 5.0);
-        j++;
+        
+        unlocksUsed = 0;
+        for (j = 0; j < UNLOCK_COUNT; j++)
+        {
+            unlocksUsed += getUnlock(i, j);
+        }
+
+        HudMessage(n:i+1, s:"\c- (unlocksUsed=", d:unlocksUsed, s:", unlocksLeft=", d:unlocksLeft[i], s:", level=", d:getStat(i, STAT_LEVEL), s:", XP=(", d:getStat(i, STAT_XP), s:", ", d:getStat(i, STAT_TOTALXP), s:"))";
+                    HUDMSG_PLAIN, UNLOCK_HBASE-1000+i, CR_WHITE, 200.1, 200.0 + ((offs * 10) << 16), 5.0);
+        offs++;
     }
 }
 
@@ -263,6 +280,9 @@ script UNLOCK_MENU (void)
     int oneUnlocked; int startloop;
     
     int usekey; int upkey; int downkey;
+    int useScr = MENU_USESPEED;
+    int upScr = MENU_UPSPEED;
+    int downScr = MENU_DOWNSPEED;
 
     for (i = 0; i < UNLOCK_COUNT; i++)
     {
@@ -291,7 +311,8 @@ script UNLOCK_MENU (void)
         {
             if (usekey == -1)
             {
-                usekey = MENU_USESPEED;
+                usekey = useScr;
+                useScr = max(1, useScr - 1);
 
                 if (checkUnlock(pln, selected, 0))
                 {
@@ -319,36 +340,57 @@ script UNLOCK_MENU (void)
         else
         {
             usekey = 0;
+            useScr = MENU_USESPEED;
         }
 
         if (keyDown(BT_FORWARD))
         {
             if (upkey == -1)
             {
-                upkey = MENU_UPSPEED;
+                upkey = upScr;
+                upScr = max(1, upScr - 1);
             }
         }
         else
         {
             upkey = 0;
+            upScr = MENU_UPSPEED;
         }
 
         if (keyDown(BT_BACK))
         {
             if (downkey == -1)
             {
-                downkey = MENU_DOWNSPEED;
+                downkey = downScr;
+                downScr = max(1, downScr - 1);
             }
         }
         else
         {
             downkey = 0;
+            downScr = MENU_DOWNSPEED;
         }
 
         left = unlocksLeft[pln];
-        
-        selected -= (upkey / MENU_UPSPEED); 
-        selected += (downkey / MENU_DOWNSPEED);
+       
+        if (upScr == 1)
+        {
+            selected -= (upkey / upScr); 
+        }
+        else
+        {
+            selected -= (upkey / (upScr + 1)); 
+        }
+
+        if (downScr == 1)
+        {
+            selected += (downkey / downScr); 
+        }
+        else
+        {
+            selected += (downkey / (downScr + 1)); 
+        }
+
 
         selected = mod(selected, UNLOCK_COUNT);
 
@@ -521,7 +563,7 @@ script UNLOCK_REGEN (void)
         GiveInventory("RocketAmmo", rocketGet);
         GiveInventory("Cell",       cellGet);
         
-        HealThing(hpGet);
+        giveHealth(hpGet);
         delay(1);
     }
 }
@@ -613,8 +655,7 @@ script GENERAL_ACTIVATE (int which)
 {
     int pln = PlayerNumber();
     int i;
-    int cName; int cAmmo; int cAmmoC; int cBit; int weps;
-
+    
     switch (which)
     {
     case 0:
@@ -636,7 +677,10 @@ script GENERAL_ACTIVATE (int which)
         break;
 
     case 5: case 6:
-        weps = getStat(pln, STAT_WEPS);
+        int cName; int cAmmo; int cAmmoC; int cBit;
+        int bestNewWeapon;
+
+        int weps = getStat(pln, STAT_WEPS);
         
         for (i = 0; i < UNLOCK_WEPCOUNT; i++)
         {
@@ -655,6 +699,7 @@ script GENERAL_ACTIVATE (int which)
             
             if (!CheckInventory(cName))
             {
+                bestNewWeapon = cName;
                 GiveInventory(cName, 1);
 
                 if (cAmmo != "<none>")
@@ -662,6 +707,11 @@ script GENERAL_ACTIVATE (int which)
                     GiveInventory(cAmmo, cAmmoC);
                 }
             }
+        }
+
+        if (bestNewWeapon != 0)
+        {
+            SetWeapon(bestNewWeapon);
         }
         break;
     }
