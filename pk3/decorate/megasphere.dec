@@ -1,0 +1,10 @@
+actor LevelMegasphere: Megasphere replaces Megasphere
+{
+    States
+    {
+      Pickup:
+        TNT1 A 0 A_GiveInventory("RedArmor", 1)
+        TNT1 A 0 A_GiveInventory("MegasphereHealth", 1)
+        stop
+    }
+}

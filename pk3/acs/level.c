@@ -26,6 +26,18 @@ function int getMax(int num)
     return unlockables[num][8];
 }
 
+function int getCost(int num)
+{
+    return unlockables[num][13];
+}
+
+function void payForUnlock(int pln, int num)
+{
+    int subAmount = unlockables[num][13];
+
+    unlocksLeft[pln] = max(unlocksLeft[pln] - subAmount, 0);
+}
+
 function int getUnlock(int pln, int num)
 {
     int i = (pln * UNLOCK_COUNT) + num;
@@ -91,7 +103,7 @@ function void unlockUnlock(int pln, int num)
 function int checkUnlock(int pln, int num, int quiet)
 {
     int s  = unlockables[num][9];
-
+    int dif;
     if (getMax(num) <= getUnlock(pln, num) && getMax(num) != -1 )
     {
         if (!quiet)
@@ -100,7 +112,17 @@ function int checkUnlock(int pln, int num, int quiet)
         }
         return false;
     }
+    else if (getCost(num) > unlocksLeft[pln])
+    {
+        if (!quiet)
+        {
+            dif = getCost(num) > unlocksLeft[pln];
 
+            Print(s:"\caNeed \cd", d:dif, s:"\ca more unlocks for \ck\"", s:getName(num), s:"\"\ca");
+        }
+        return false;
+    }
+    
     if (s == -1)
     {
         return true;
@@ -151,7 +173,21 @@ function void addStat(int pln, int which, int value)
     startStats[(pln * STAT_COUNT) + which] += value;
 }
 
+function int getArmorIndex(void)
+{
+    int pln = PlayerNumber();
+    int i;
 
+    for (i = 0; i < UNLOCK_ARMORCOUNT; i++)
+    {
+        if (GetArmorType(unlockArmors[i], pln) )
+        {
+            return i;
+        }
+    }
+
+    return -1;
+}
 
 
 
@@ -184,6 +220,7 @@ script UNLOCK_ENTER enter
         setStat(pln, STAT_NEXTL, 50);
         setStat(pln, STAT_HP_REGENRATE, 0);
         setStat(pln, STAT_AMMO_REGENRATE, 0);
+        setStat(pln, STAT_ARMOR_REGENRATE, 0);
 
         for (i = 0; i < UNLOCK_WEPCOUNT; i++)
         {
@@ -236,32 +273,6 @@ script UNLOCK_DISCONNECT (int pln) disconnect
     }
 }
 
-script UNLOCK_REPORT (void)
-{
-    SetHudSize(800, 600, 1);
-
-    int i; int j; int offs;
-
-    int unlocksUsed;
-
-    for (i = 0; i < 32; i++)
-    {
-        if (!PlayerInGame(i))
-        {
-            continue;
-        }
-
-        unlocksUsed = 0;
-        for (j = 0; j < UNLOCK_COUNT; j++)
-        {
-            unlocksUsed += getUnlock(i, j);
-        }
-
-        HudMessage(n:i+1, s:"\c- (unlocksUsed=", d:unlocksUsed, s:", unlocksLeft=", d:unlocksLeft[i], s:", level=", d:getStat(i, STAT_LEVEL), s:", XP=(", d:getStat(i, STAT_XP), s:", ", d:getStat(i, STAT_TOTALXP), s:"))";
-                    HUDMSG_PLAIN, UNLOCK_HBASE-1000+i, CR_WHITE, 200.1, 200.0 + ((offs * 10) << 16), 5.0);
-        offs++;
-    }
-}
 
 script UNLOCK_MENU (void)
 {
@@ -276,9 +287,10 @@ script UNLOCK_MENU (void)
 
     uMenuLock[pln] = 1;
     GiveInventory("SpawnProtection", 1);
-
+    
+    int refresh;
     int i; int tic; int selected; int oSelected; int left; int oLeft;
-    int name; int l_max; int current;
+    int name; int l_max; int current; int cost;
     int msgColor; int nameColor;
     int oneUnlocked; int startloop;
 
@@ -319,24 +331,18 @@ script UNLOCK_MENU (void)
 
                 if (checkUnlock(pln, selected, 0))
                 {
-                    unlocksLeft[pln]--;
-
+                    // Due to the delay, this isn't usable
+                    // ACS_ExecuteAlways(PUKE_UNLOCKANDUSE, 0, selected,0,0);
+                    
                     unlockUnlock(pln, selected);
+                    applyUnlock(pln, selected);
+                    payForUnlock(pln, selected);
 
                     name    = getName(selected);
                     l_max   = getMax(selected);
                     current = getUnlock(pln, selected);
-
-                    if (l_max == -1)
-                    {
-                        HudMessage(s:nameColor, s:name, s:"\c- (Current: \cd", d:current, s:"\c-)";
-                            HUDMSG_FADEOUT, UNLOCK_HBASE + selected, CR_BRICK, (100.0 * (selected / 30)) + 80.1, (15.0 * (selected % 30)) + 80.1, 2.0, 2.0);
-                    }
-                    else
-                    {
-                        HudMessage(s:nameColor, s:name, s:"\c- (Max: \cf", d:l_max, s:"\c-, current: \cd", d:current, s:"\c-)";
-                            HUDMSG_FADEOUT, UNLOCK_HBASE + selected, CR_BRICK, (100.0 * (selected / 30)) + 80.1, (15.0 * (selected % 30)) + 80.1, 2.0, 2.0);
-                    }
+                    
+                    refresh = 1;
                 }
             }
         }
@@ -396,11 +402,12 @@ script UNLOCK_MENU (void)
 
 
         selected = mod(selected, UNLOCK_COUNT);
-
-        if (tic % MENU_REFRESH == 0 || oSelected != selected || oLeft != left)
+        
+        if ((tic % MENU_REFRESH == 0) || (oSelected != selected) || (oLeft != left) || (refresh))
         {
             tic = 0;
             oneUnlocked = 0;
+            refresh = 0;
 
             SetFont("BIGFONT");
 
@@ -422,6 +429,7 @@ script UNLOCK_MENU (void)
 
                 if (checkUnlock(pln, i, 1))
                 {
+                    oneUnlocked = 1;
                     nameColor = "\ck";
                 }
                 else
@@ -431,29 +439,32 @@ script UNLOCK_MENU (void)
 
                 name    = getName(i);
                 l_max   = getMax(i);
+                cost    = getCost(i);
                 current = getUnlock(pln, i);
-
-                if (current < l_max || l_max == -1)
-                {
-                    oneUnlocked = 1;
-                }
 
                 if (l_max == -1)
                 {
-                    HudMessage(s:nameColor, s:name, s:"\c- (Current: \cd", d:current, s:"\c-)";
+                    HudMessage(s:nameColor, s:name, s:"\c- (Current: \cd", d:current, s:"\c-, cost: \cp", d:cost, s:"\c-)";
+                        HUDMSG_FADEOUT, UNLOCK_HBASE + i, msgColor, (75.0 * (i / 30)) + 80.1, (11.0 * (i % 30)) + 60.1,
+                        ((MENU_REFRESH << 16) / 35) + 2.0, 2.0);
+                }
+                else if (l_max == current)
+                {
+                    HudMessage(s:nameColor, s:name, s:"\c- (\cgAt Max \c-(\cf", d:l_max, s:"\c-))";
                         HUDMSG_FADEOUT, UNLOCK_HBASE + i, msgColor, (75.0 * (i / 30)) + 80.1, (11.0 * (i % 30)) + 60.1,
                         ((MENU_REFRESH << 16) / 35) + 2.0, 2.0);
                 }
                 else
                 {
-                    HudMessage(s:nameColor, s:name, s:"\c- (Max: \cf", d:l_max, s:"\c-, current: \cd", d:current, s:"\c-)";
+                    HudMessage(s:nameColor, s:name, s:"\c- (Max: \cf", d:l_max, s:"\c-, current: \cd", d:current, s:"\c-, cost: \cp", d:cost, s:"\c-)";
                         HUDMSG_FADEOUT, UNLOCK_HBASE + i, msgColor, (75.0 * (i / 30)) + 80.1, (11.0 * (i % 30)) + 60.1,
                         ((MENU_REFRESH << 16) / 35) + 2.0, 2.0);
                 }
-                    HudMessage(s:"\cf", k:"+forward", s:"\c- scrolls down, \cf", k:"+back", s:"\c- up, \cf",
-                                k:"+use", s:"\c- selects, \cf", k:"+jump", s:"\c- exits";
-                            HUDMSG_FADEOUT, UNLOCK_HBASE - 2, CR_GREEN, 320.4, 460.2,
-                            ((MENU_REFRESH << 16) / 35) + 2.0, 2.0);
+                
+                HudMessage(s:"\cf", k:"+forward", s:"\c- scrolls down, \cf", k:"+back", s:"\c- up, \cf",
+                            k:"+use", s:"\c- selects, \cf", k:"+jump", s:"\c- exits";
+                        HUDMSG_FADEOUT, UNLOCK_HBASE - 2, CR_GREEN, 320.4, 460.2,
+                        ((MENU_REFRESH << 16) / 35) + 2.0, 2.0);
             }
         }
 
@@ -537,36 +548,75 @@ script UNLOCK_REGEN (void)
 {
     int pln = PlayerNumber();
     int tic;
-    int aRegenRate; int hRegenRate;
+    int aRegenRate; int hRegenRate; int rRegenRate;
+    int aIndex; int curArm; int newArm; int armDif;
+    int aLevel;
 
-    int hpRate; int clipRate; int shellRate; int rocketRate; int cellRate;
-    int hpGet;  int clipGet;  int shellGet;  int rocketGet;  int cellGet;
+    int hpRate; int armRate; int clipRate; int shellRate; int rocketRate; int cellRate;
+    int hpGet;  int armGet;  int clipGet;  int shellGet;  int rocketGet;  int cellGet;
 
     while (PlayerInGame(pln))
     {
         hRegenRate = getStat(pln, STAT_HP_REGENRATE);
         aRegenRate = getStat(pln, STAT_AMMO_REGENRATE);
+        rRegenRate = getStat(pln, STAT_ARMOR_REGENRATE);
 
-        hpRate += hRegenRate;
-        hpGet   = hpRate / HEALTH_REGENRATE;
-
+        hpRate  += hRegenRate;   hpGet  = hpRate  / HEALTH_REGENRATE;
+        armRate += rRegenRate;   armGet = armRate / ARMOR_REGENRATE;
+        
         clipRate   += aRegenRate;   clipGet   = clipRate   / AMMO_CLIPRATE;
         shellRate  += aRegenRate;   shellGet  = shellRate  / AMMO_SHELLRATE;
         rocketRate += aRegenRate;   rocketGet = rocketRate / AMMO_ROCKETRATE;
         cellRate   += aRegenRate;   cellGet   = cellRate   / AMMO_CELLRATE;
 
         hpRate     = mod(hpRate,     HEALTH_REGENRATE);
+        armRate    = mod(armRate,    ARMOR_REGENRATE);
         clipRate   = mod(clipRate,   AMMO_CLIPRATE);
         shellRate  = mod(shellRate,  AMMO_SHELLRATE);
         rocketRate = mod(rocketRate, AMMO_ROCKETRATE);
         cellRate   = mod(cellRate,   AMMO_CELLRATE);
 
+        giveHealth(hpGet);
+        GiveInventory("ArmorBonus", armGet);
+        
         GiveInventory("Clip",       clipGet);
         GiveInventory("Shell",      shellGet);
         GiveInventory("RocketAmmo", rocketGet);
         GiveInventory("Cell",       cellGet);
+        
+        // Monitor armor class
+        
+        aLevel = middle(0, getStat(pln, STAT_ARMORLEVEL), UNLOCK_ARMORCOUNT);
+        curArm = CheckInventory("BasicArmor");
+        
+        if (curArm > 0 && aLevel > 0)
+        {
+            aIndex = getArmorIndex();
+            
+            if (aIndex < aLevel)
+            {
+                TakeInventory("BasicArmor", curArm);
 
-        giveHealth(hpGet);
+                GiveInventory(unlockArmors[aLevel], 1);
+                
+                newArm = CheckInventory("BasicArmor");
+                armDif = newArm - curArm;
+
+                if (armDif == 0)
+                {
+                }
+                else if (armDif < 0)
+                {
+                    GiveInventory("ArmorBonus", -armDif);
+                }
+                else
+                {
+                    TakeInventory("BasicArmor", newArm-1);
+                    GiveInventory("ArmorBonus", curArm-1);
+                }
+            }
+        }
+
         delay(1);
     }
 }
@@ -679,7 +729,7 @@ script GENERAL_ACTIVATE (int which)
         SetActorProperty(0, APROP_JUMPZ, getStat(pln, STAT_JUMPZ));
         break;
 
-    case 5: case 6:
+    case 6: case 7:
         int cName; int cAmmo; int cAmmoC; int cBit;
         int bestNewWeapon;
 
@@ -749,6 +799,10 @@ script GENERAL_UNLOCK (int which, int a1, int a2)
         break;
 
     case 5:
+        addStat(pln, STAT_ARMOR_REGENRATE, a1);
+        break;
+
+    case 6:
         weps = getStat(pln, STAT_WEPS);
         allweps = pow(2, a2 - a1) - 1;
         allweps <<= a1;
@@ -780,19 +834,22 @@ script GENERAL_UNLOCK (int which, int a1, int a2)
         setStat(pln, STAT_WEPS, weps | cBit);
         break;
 
-    case 6:
+    case 7:
         weps = getStat(pln, STAT_WEPS);
         setStat(pln, STAT_WEPS, weps | pow(2, a1));
         break;
+    
+    case 8:
+        addStat(pln, STAT_ARMORLEVEL, 1);
+        break;
     }
-
-    applyUnlock(pln, which);
 }
 
 script GENERAL_CHECK (int which, int a1, int a2)
 {
     int pln = PlayerNumber();
     int quiet; int check; int end;
+    int necessaryLevel; int diff;
 
     switch (which)
     {
@@ -828,4 +885,84 @@ script GENERAL_CHECK (int which, int a1, int a2)
     }
 
     SetResultValue(end);
+}
+
+script SCALED_CHECK (int base, int check, int scale)
+{
+    int pln = PlayerNumber();
+    int quiet = 0;
+    int ret = 1;
+    int diff;
+
+    if (check < 0)
+    {
+        check = -check;
+        quiet = 1;
+    }
+
+    int necessaryLevel = (getUnlock(pln, base) + 1) * scale;
+
+    if (getUnlock(pln, check) < necessaryLevel)
+    {
+        diff = necessaryLevel - getUnlock(pln, check);
+
+        if (!quiet)
+        {
+            Print(s:"\caNeed to unlock \cd", d:necessaryLevel, s:"\ca levels of \ck\"", s:getName(check), s:"\"\ca to unlock this");
+        }
+
+        ret = 0;
+    }
+
+    SetResultValue(ret);
+}
+
+script PUKE_UNLOCKANDUSE (int which)
+{
+    int pln = PlayerNumber();
+
+    unlockUnlock(pln, which);
+    applyUnlock(pln, which);
+    payForUnlock(pln, which);
+}
+
+
+script PUKE_REPORT (void)
+{
+    SetHudSize(800, 600, 1);
+
+    int i; int j; int offs;
+
+    int used; int left;
+    int level; int xp; int totXP;
+    int maxHP; int speed; int jumpZ;
+    int hpReg; int arReg; int amReg;
+    for (i = 0; i < 32; i++)
+    {
+        if (!PlayerInGame(i))
+        {
+            continue;
+        }
+
+        used = 0;
+        for (j = 0; j < UNLOCK_COUNT; j++)
+        {
+            used += getUnlock(i, j);
+        }
+        
+        left = unlocksLeft[i];
+        level = getStat(i, STAT_LEVEL);
+        xp    = getStat(i, STAT_XP);
+        totXP = getStat(i, STAT_TOTALXP);
+        maxHP = getStat(i, STAT_HP);
+        speed = getStat(i, STAT_SPEED);
+        jumpZ = getStat(i, STAT_JUMPZ);
+        hpReg = getStat(i, STAT_HP_REGENRATE);
+        arReg = getStat(i, STAT_ARMOR_REGENRATE);
+        amReg = getStat(i, STAT_AMMO_REGENRATE);
+
+        HudMessage(n:i+1, s:"\c- (used=", d:used, s:", left=", d:left, s:", level=", d:level, s:", xp=(", d:xp, s:", ", d:totXP, s:"), maxHP=", d:maxHP, s:",\nspeed=", f:speed, s:", jumpZ=", f:jumpZ, s:", hpReg=", d:hpReg, s:", arReg=", d:arReg, s:", amReg=", d:amReg, s:")";
+                    HUDMSG_PLAIN, UNLOCK_HBASE-1000+i, CR_WHITE, 15.1, 50.0 + ((offs * 20) << 16), 5.0);
+        offs++;
+    }
 }
