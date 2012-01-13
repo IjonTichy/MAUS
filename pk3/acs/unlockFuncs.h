@@ -86,4 +86,33 @@ function int keyPressed(int key)
     return 0;
 }
 
+function int adjustBottom(int tmin, int tmax, int i)
+{
+    if (i < tmin)
+    {
+        tmin = i;
+    }
+    
+    if (i > tmax)
+    {
+        tmin += (i - tmax);
+    }
+    
+    return tmin;
+}
 
+
+function int adjustTop(int tmin, int tmax, int i)
+{
+    if (i < tmin)
+    {
+        tmax -= (tmin - i);
+    }
+    
+    if (i > tmax)
+    {
+        tmax = i;
+    }
+    
+    return tmax;
+}

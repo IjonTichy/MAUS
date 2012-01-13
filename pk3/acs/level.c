@@ -103,22 +103,13 @@ function void unlockUnlock(int pln, int num)
 function int checkUnlock(int pln, int num, int quiet)
 {
     int s  = unlockables[num][9];
-    int dif;
+    int diff; int addS = "";
+
     if (getMax(num) <= getUnlock(pln, num) && getMax(num) != -1 )
     {
         if (!quiet)
         {
-            Print(s:"\caAlready at max level (\cd", d:getMax(num), s:"\ca) for \ck\"", s:getName(num), s:"\"\ca");
-        }
-        return false;
-    }
-    else if (getCost(num) > unlocksLeft[pln])
-    {
-        if (!quiet)
-        {
-            dif = getCost(num) > unlocksLeft[pln];
-
-            Print(s:"\caNeed \cd", d:dif, s:"\ca more unlocks for \ck\"", s:getName(num), s:"\"\ca");
+            Print(s:"\caAlready at max level for \ck\"", s:getName(num), s:"\"\ca");
         }
         return false;
     }
@@ -143,7 +134,23 @@ function int checkUnlock(int pln, int num, int quiet)
     }
 
     int ret = ACS_ExecuteWithResult(s, a1,a2,a3);
-
+    
+    if (ret == 1 && getCost(num) > unlocksLeft[pln])
+    {
+        diff = getCost(num) - unlocksLeft[pln];
+        
+        if (diff != 1)
+        {
+            addS = "s";
+        }
+        
+        if (!quiet)
+        {
+            Print(s:"\caNeed \cd", d:diff, s:"\ca more unlock", s:addS, s:" available to buy \ck\"", s:getName(num), s:"\"\ca");
+        }
+        return false;
+    }
+    
     return ret;
 }
 
@@ -188,6 +195,84 @@ function int getArmorIndex(void)
 
     return -1;
 }
+
+function int oneUnlocked(int pln)
+{
+    int i;
+
+    for (i = 0; i < UNLOCK_COUNT; i++)
+    {
+        if (checkUnlock(pln, i, 0))
+        {
+            return 1;
+        }
+    }
+    
+    return 0;
+}
+
+function void printMenuItem(int pln, int pos, int which, int selected)
+{
+    int nameColor; int maxColor; int curColor; int costColor;
+
+    int left    = unlocksLeft[pln];
+    int name    = getName(which);
+    int l_max   = getMax(which);
+    int cost    = getCost(which);
+    int current = getUnlock(pln, which);
+
+    if (selected == which)
+    {
+        maxColor = CR_LIGHTBLUE;
+        costColor = CR_TAN;
+
+        if (l_max == current) { curColor = CR_RED; }
+        else                  { curColor = CR_GREEN; }
+
+        if (checkUnlock(pln, which, 1)) { nameColor = CR_GOLD; }
+        else                        { nameColor = CR_DARKGREY; }
+
+    }
+    else
+    {
+        maxColor = CR_BLUE;
+        costColor = CR_BROWN;
+
+        if (l_max == current) { curColor = CR_DARKRED; }
+        else                  { curColor = CR_DARKGREEN; }
+
+        if (checkUnlock(pln, which, 1)) { nameColor = CR_YELLOW; }
+        else                        { nameColor = CR_BLACK; }
+    }
+
+    // For convenience
+    int FIELDBASE   = UNLOCK_HBASE + (4 * pos);
+    int POS_Y       = (MENU_SPACING * pos) + 110.1;
+    int REFRESHRATE = ((MENU_REFRESH << 16) / 35) + 2.0;
+
+    HudMessage(s:name; HUDMSG_FADEOUT, FIELDBASE, nameColor, 215.2, POS_Y, REFRESHRATE, 2.0);
+    
+    if (l_max == -1)
+    {
+        HudMessage(s:"---"; HUDMSG_FADEOUT, FIELDBASE + 1, maxColor, 245.4, POS_Y, REFRESHRATE, 2.0); 
+    }
+    else
+    {
+        HudMessage(d:l_max; HUDMSG_FADEOUT, FIELDBASE + 1, maxColor, 245.4, POS_Y, REFRESHRATE, 2.0); 
+    }
+
+    if (l_max == current)
+    {
+        HudMessage(s:"MAX"; HUDMSG_FADEOUT, FIELDBASE + 2, curColor, 275.4, POS_Y, REFRESHRATE, 2.0); 
+    }
+    else
+    {
+        HudMessage(d:current; HUDMSG_FADEOUT, FIELDBASE + 2, curColor, 275.4, POS_Y, REFRESHRATE, 2.0); 
+    }
+
+    HudMessage(d:cost; HUDMSG_FADEOUT, FIELDBASE + 3, costColor, 305.4, POS_Y, REFRESHRATE, 2.0);
+}
+
 
 
 
@@ -288,11 +373,12 @@ script UNLOCK_MENU (void)
     uMenuLock[pln] = 1;
     GiveInventory("SpawnProtection", 1);
     
-    int refresh;
-    int i; int tic; int left; int oLeft;
-    int name; int l_max; int current; int cost;
-    int msgColor; int nameColor;
-    int oneUnlocked; int startloop;
+    int i; int j;
+    int refresh; int top;
+    int tic; int left; int oLeft;
+    int name; int current; int cost;
+    int msgColor;
+    int startloop;
     
     int selected;
     int oSelected;
@@ -314,15 +400,10 @@ script UNLOCK_MENU (void)
     // Mainloop
     while (startloop)
     {
-        if (PlayerIsBot(pln))
-        {
-            break;
-        }
-        if (keyPressed(BT_JUMP))
-        {
-            break;
-        }
-
+        left = unlocksLeft[pln];
+        
+        if (PlayerIsBot(pln) || !left || !oneUnlocked(pln) ) { break; }
+        
         GiveInventory("SpawnStop", 1);
 
         if (keyDown(BT_USE))
@@ -339,12 +420,8 @@ script UNLOCK_MENU (void)
 
                 if (checkUnlock(pln, selected, 0))
                 {
-                    // Due to the delay, this isn't usable
-                    // ACS_ExecuteAlways(PUKE_UNLOCKANDUSE, 0, selected,0,0);
-                    
                     unlockUnlock(pln, selected);
                     payForUnlock(pln, selected);
-
                     refresh = 1;
                 }
             }
@@ -354,7 +431,8 @@ script UNLOCK_MENU (void)
             usekey = 0;
             useScr = MENU_USESPEED;
         }
-
+        
+        // Begin scrolling
         if (keyDown(BT_FORWARD))
         {
             if (upkey == -1)
@@ -383,119 +461,103 @@ script UNLOCK_MENU (void)
             downScr = MENU_DOWNSPEED;
         }
 
-        left = unlocksLeft[pln];
+        if (upScr == 1) { selected -= (upkey / upScr); } 
+        else { selected -= (upkey / (upScr + 1)); }
 
-        if (upScr == 1)
-        {
-            selected -= (upkey / upScr);
-        }
-        else
-        {
-            selected -= (upkey / (upScr + 1));
-        }
-
-        if (downScr == 1)
-        {
-            selected += (downkey / downScr);
-        }
-        else
-        {
-            selected += (downkey / (downScr + 1));
-        }
-
-
+        if (downScr == 1) { selected += (downkey / downScr); }
+        else { selected += (downkey / (downScr + 1)); }
+        // End scrolling
+        
         selected = mod(selected, UNLOCK_COUNT+1);
         
         if ((tic % MENU_REFRESH == 0) || (oSelected != selected) || (oLeft != left) || (refresh))
         {
             tic = 0;
-            oneUnlocked = 0;
             refresh = 0;
+           
+            if (selected == UNLOCK_COUNT)
+            {
+                top = adjustBottom(top, top+MENU_SIZE-1, 0);
+            }
+            else
+            {
+                top = adjustBottom(top, top+MENU_SIZE-1, selected);
+            }
 
             SetFont("BIGFONT");
 
             HudMessage(s:"\cfLEVEL UP\c- - \cd", d:left, s:"\c- left";
-                HUDMSG_FADEOUT, UNLOCK_HBASE - 1, CR_WHITE, 77.3, 34.1, ((MENU_REFRESH << 16) / 35) + 2.0, 2.0);
-
-            SetFont("SMALLFONT");
+                HUDMSG_FADEOUT, UNLOCK_HBASE - 1, CR_WHITE, 220.4, 34.1, ((MENU_REFRESH << 16) / 35) + 2.0, 2.0);
             
-            if (selected == UNLOCK_COUNT)
+            SetFont("SMALLFONT");
+
+            if (top > 0)
             {
-                msgColor = CR_BRICK;
+                HudMessage(s:"/\\";
+                        HUDMSG_FADEOUT, UNLOCK_HBASE - 5, CR_GOLD, 320.4, 100.1,
+                        ((MENU_REFRESH << 16) / 35) + 2.0, 2.0);
             }
             else
             {
-                msgColor = CR_WHITE;
+                HudMessage(s:"";
+                        HUDMSG_FADEOUT, UNLOCK_HBASE - 5, CR_GOLD, 320.4, 100.1,
+                        ((MENU_REFRESH << 16) / 35) + 2.0, 2.0);
             }
 
-            HudMessage(s:"Exit unlock menu";
-                HUDMSG_FADEOUT, UNLOCK_HBASE - 2, msgColor, 80.1, 60.1, ((MENU_REFRESH << 16) / 35) + 2.0, 2.0);
-
-            for (i = 0; i < UNLOCK_COUNT; i++)
+            if (top < UNLOCK_COUNT-MENU_SIZE)
             {
-                if (selected == i)
-                {
-                    msgColor = CR_BRICK;
-                }
-                else
-                {
-                    msgColor = CR_DARKGREY;
-                }
-
-                if (checkUnlock(pln, i, 1))
-                {
-                    oneUnlocked = 1;
-                    nameColor = "\ck";
-                }
-                else
-                {
-                    nameColor = "\cm";
-                }
-
-                name    = getName(i);
-                l_max   = getMax(i);
-                cost    = getCost(i);
-                current = getUnlock(pln, i);
-
-                if (l_max == -1)
-                {
-                    HudMessage(s:nameColor, s:name, s:"\c- (Current: \cd", d:current, s:"\c-, cost: \cp", d:cost, s:"\c-)";
-                        HUDMSG_FADEOUT, UNLOCK_HBASE + i, msgColor, 80.1, (11.0 * (i+2)) + 60.1,
+                HudMessage(s:"\\/";
+                        HUDMSG_FADEOUT, UNLOCK_HBASE - 6, CR_GOLD, 320.4, 110.1 + (MENU_SIZE * MENU_SPACING),
                         ((MENU_REFRESH << 16) / 35) + 2.0, 2.0);
-                }
-                else if (l_max == current)
-                {
-                    HudMessage(s:nameColor, s:name, s:"\c- (\cgAt Max \c-(\cf", d:l_max, s:"\c-))";
-                        HUDMSG_FADEOUT, UNLOCK_HBASE + i, msgColor, 80.1, (11.0 * (i+2)) + 60.1,
-                        ((MENU_REFRESH << 16) / 35) + 2.0, 2.0);
-                }
-                else
-                {
-                    HudMessage(s:nameColor, s:name, s:"\c- (Max: \cf", d:l_max, s:"\c-, current: \cd", d:current, s:"\c-, cost: \cp", d:cost, s:"\c-)";
-                        HUDMSG_FADEOUT, UNLOCK_HBASE + i, msgColor, 80.1, (11.0 * (i+2)) + 60.1,
-                        ((MENU_REFRESH << 16) / 35) + 2.0, 2.0);
-                }
-                
             }
+            else
+            {
+                HudMessage(s:"";
+                        HUDMSG_FADEOUT, UNLOCK_HBASE - 6, CR_GOLD, 320.4, 110.1,
+                        ((MENU_REFRESH << 16) / 35) + 2.0, 2.0);
+            } 
+
+            
+            // For convenience
+            int FIELDBASE   = UNLOCK_HBASE - 100;
+            int POS_Y       = 84.1;
+            int REFRESHRATE = ((MENU_REFRESH << 16) / 35) + 2.0;
+
+            HudMessage(s:"Name";    HUDMSG_FADEOUT, FIELDBASE,     CR_GOLD,      155.4, POS_Y+10.0, REFRESHRATE, 2.0);
+            HudMessage(s:"Max";     HUDMSG_FADEOUT, FIELDBASE - 1, CR_LIGHTBLUE, 245.4, POS_Y,      REFRESHRATE, 2.0); 
+            HudMessage(s:"Current"; HUDMSG_FADEOUT, FIELDBASE - 2, CR_GREEN,     275.4, POS_Y+10.0, REFRESHRATE, 2.0); 
+            HudMessage(s:"Cost";    HUDMSG_FADEOUT, FIELDBASE - 3, CR_TAN,       305.4, POS_Y,      REFRESHRATE, 2.0);
+           
+
+            HudMessage(s:"\cf", k:"+forward", s:"\c- scrolls up, \cf", k:"+back", s:"\c- down, \cf", k:"+use", s:"\c- selects";
+                    HUDMSG_FADEOUT, UNLOCK_HBASE - 3, CR_GREEN, 220.4, 50.1,
+                    ((MENU_REFRESH << 16) / 35) + 2.0, 2.0);
+            
+            // (x of y)
+            HudMessage(s:"\(\cd", d:mod(selected+1, UNLOCK_COUNT+1), s:"\c- of \cf", d:UNLOCK_COUNT, s:"\c-)";
+                    HUDMSG_FADEOUT, UNLOCK_HBASE - 4, CR_DARKGREY, 220.4, 110.1 + (MENU_SIZE * MENU_SPACING),
+                    ((MENU_REFRESH << 16) / 35) + 2.0, 2.0);
             
 
-            HudMessage(s:"\cf", k:"+forward", s:"\c- scrolls down, \cf", k:"+back", s:"\c- up, \cf",
-                        k:"+use", s:"\c- selects, \cf", k:"+jump", s:"\c- exits";
-                    HUDMSG_FADEOUT, UNLOCK_HBASE - 3, CR_GREEN, 320.4, 460.2,
-                    ((MENU_REFRESH << 16) / 35) + 2.0, 2.0);
 
+            if (selected == UNLOCK_COUNT) { msgColor = CR_BRICK; }
+            else                          { msgColor = CR_WHITE; }
+
+            HudMessage(s:"Exit unlock menu";
+                HUDMSG_FADEOUT, UNLOCK_HBASE - 2, msgColor, 220.4, 70.1, ((MENU_REFRESH << 16) / 35) + 2.0, 2.0);
+            
+            for (i = 0; i < min(MENU_SIZE, UNLOCK_COUNT); i++)
+            {
+                j = mod(i + top, UNLOCK_COUNT);
+                printMenuItem(pln, i, j, selected);
+            }
         }
-
 
         tic++;
         oLeft     = left;
         oSelected = selected;
-
-        if (!left || !oneUnlocked)
-        {
-            break;
-        }
         usekey--; upkey--; downkey--;
+        
         Delay(1);
     }
 
@@ -515,11 +577,8 @@ script UNLOCK_MENU (void)
         }
     }
 
-
     GiveInventory("EndSpawnProtection", 1);
     uMenuLock[pln] = 0;
-
-
 }
 
 
@@ -532,6 +591,7 @@ script UNLOCK_LEVELHUD (void)
     int nextLevel; int oNextLevel;
 
     SetHudSize(640, 480, 1);
+    SetFont("BIGFONT");
 
     while (PlayerInGame(pln))
     {
@@ -548,11 +608,17 @@ script UNLOCK_LEVELHUD (void)
         {
             SetFont("BIGFONT");
             HudMessage(s:"Level \ck", d:level;
-                HUDMSG_FADEOUT, UNLOCK_HBASE2 + 1, CR_GREY, 580.2, 110.2, ((HUD_REFRESH << 16) / 35) + 2.0, 2.0);
+                HUDMSG_FADEOUT, UNLOCK_HBASE2 + 1, CR_GREY, 480.1, 110.2, ((HUD_REFRESH << 16) / 35) + 2.0, 2.0);
+
+            HudMessage(s:"/";
+                HUDMSG_FADEOUT, UNLOCK_HBASE2 + 4, CR_GOLD, 554.4, 135.2, ((HUD_REFRESH << 16) / 35) + 2.0, 2.0);
 
             SetFont("SMALLFONT");
-            HudMessage(s:"XP: \cd", d:xp, s:"\cf/\cd", d:nextLevel;
-                HUDMSG_FADEOUT, UNLOCK_HBASE2 + 2, CR_WHITE, 590.2, 130.2, ((HUD_REFRESH << 16) / 35) + 2.0, 2.0);
+            HudMessage(s:"XP: \cd", d:xp;
+                HUDMSG_FADEOUT, UNLOCK_HBASE2 + 2, CR_WHITE, 510.1, 130.2, ((HUD_REFRESH << 16) / 35) + 2.0, 2.0);
+            
+            HudMessage(d:nextLevel;
+                HUDMSG_FADEOUT, UNLOCK_HBASE2 + 3, CR_GREEN, 555.1, 141.2, ((HUD_REFRESH << 16) / 35) + 2.0, 2.0);
 
             tic = 0;
         }
@@ -681,7 +747,7 @@ script LEVEL_RECALC (int pln)
 
 script LEVEL_ADDXP_ONKILL (int isMonster, int amount)
 {
-    int killedHP = GetActorProperty(0, APROP_SpawnHealth);  // in case monster
+    int killedHP = GetActorProperty(0, APROP_SpawnHealth);
     int killedPln = PlayerNumber();
     int killedTeam = GetPlayerInfo(killedPln, PLAYERINFO_TEAM);
 
@@ -765,8 +831,6 @@ script GENERAL_ACTIVATE (int which)
             cName  = unlockWeapons[i];
             cAmmo  = unlockAmmo[i];
             cAmmoC = unlockAmmoCount[i];
-
-            //print(d:i, s:"   ", s:cName, s:"   ", s:cAmmo, s:"   ", d:cAmmoC);
 
             if (!CheckInventory(cName))
             {

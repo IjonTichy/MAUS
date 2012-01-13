@@ -29,6 +29,8 @@
 #define MENU_USESPEED       10
 #define MENU_UPSPEED        8
 #define MENU_DOWNSPEED      8
+#define MENU_SIZE           10
+#define MENU_SPACING        11.0
 
 #define AMMO_CLIPRATE       55
 #define AMMO_SHELLRATE      245
