@@ -289,10 +289,13 @@ script UNLOCK_MENU (void)
     GiveInventory("SpawnProtection", 1);
     
     int refresh;
-    int i; int tic; int selected; int oSelected; int left; int oLeft;
+    int i; int tic; int left; int oLeft;
     int name; int l_max; int current; int cost;
     int msgColor; int nameColor;
     int oneUnlocked; int startloop;
+    
+    int selected;
+    int oSelected;
 
     int usekey; int upkey; int downkey;
     int useScr = MENU_USESPEED;
@@ -328,6 +331,11 @@ script UNLOCK_MENU (void)
             {
                 usekey = useScr;
                 useScr = max(1, useScr - 1);
+                
+                if (selected == UNLOCK_COUNT)
+                {
+                    break;
+                }
 
                 if (checkUnlock(pln, selected, 0))
                 {
@@ -335,13 +343,8 @@ script UNLOCK_MENU (void)
                     // ACS_ExecuteAlways(PUKE_UNLOCKANDUSE, 0, selected,0,0);
                     
                     unlockUnlock(pln, selected);
-                    applyUnlock(pln, selected);
                     payForUnlock(pln, selected);
 
-                    name    = getName(selected);
-                    l_max   = getMax(selected);
-                    current = getUnlock(pln, selected);
-                    
                     refresh = 1;
                 }
             }
@@ -401,7 +404,7 @@ script UNLOCK_MENU (void)
         }
 
 
-        selected = mod(selected, UNLOCK_COUNT);
+        selected = mod(selected, UNLOCK_COUNT+1);
         
         if ((tic % MENU_REFRESH == 0) || (oSelected != selected) || (oLeft != left) || (refresh))
         {
@@ -415,6 +418,18 @@ script UNLOCK_MENU (void)
                 HUDMSG_FADEOUT, UNLOCK_HBASE - 1, CR_WHITE, 77.3, 34.1, ((MENU_REFRESH << 16) / 35) + 2.0, 2.0);
 
             SetFont("SMALLFONT");
+            
+            if (selected == UNLOCK_COUNT)
+            {
+                msgColor = CR_BRICK;
+            }
+            else
+            {
+                msgColor = CR_WHITE;
+            }
+
+            HudMessage(s:"Exit unlock menu";
+                HUDMSG_FADEOUT, UNLOCK_HBASE - 2, msgColor, 80.1, 60.1, ((MENU_REFRESH << 16) / 35) + 2.0, 2.0);
 
             for (i = 0; i < UNLOCK_COUNT; i++)
             {
@@ -445,27 +460,30 @@ script UNLOCK_MENU (void)
                 if (l_max == -1)
                 {
                     HudMessage(s:nameColor, s:name, s:"\c- (Current: \cd", d:current, s:"\c-, cost: \cp", d:cost, s:"\c-)";
-                        HUDMSG_FADEOUT, UNLOCK_HBASE + i, msgColor, (75.0 * (i / 30)) + 80.1, (11.0 * (i % 30)) + 60.1,
+                        HUDMSG_FADEOUT, UNLOCK_HBASE + i, msgColor, 80.1, (11.0 * (i+2)) + 60.1,
                         ((MENU_REFRESH << 16) / 35) + 2.0, 2.0);
                 }
                 else if (l_max == current)
                 {
                     HudMessage(s:nameColor, s:name, s:"\c- (\cgAt Max \c-(\cf", d:l_max, s:"\c-))";
-                        HUDMSG_FADEOUT, UNLOCK_HBASE + i, msgColor, (75.0 * (i / 30)) + 80.1, (11.0 * (i % 30)) + 60.1,
+                        HUDMSG_FADEOUT, UNLOCK_HBASE + i, msgColor, 80.1, (11.0 * (i+2)) + 60.1,
                         ((MENU_REFRESH << 16) / 35) + 2.0, 2.0);
                 }
                 else
                 {
                     HudMessage(s:nameColor, s:name, s:"\c- (Max: \cf", d:l_max, s:"\c-, current: \cd", d:current, s:"\c-, cost: \cp", d:cost, s:"\c-)";
-                        HUDMSG_FADEOUT, UNLOCK_HBASE + i, msgColor, (75.0 * (i / 30)) + 80.1, (11.0 * (i % 30)) + 60.1,
+                        HUDMSG_FADEOUT, UNLOCK_HBASE + i, msgColor, 80.1, (11.0 * (i+2)) + 60.1,
                         ((MENU_REFRESH << 16) / 35) + 2.0, 2.0);
                 }
                 
-                HudMessage(s:"\cf", k:"+forward", s:"\c- scrolls down, \cf", k:"+back", s:"\c- up, \cf",
-                            k:"+use", s:"\c- selects, \cf", k:"+jump", s:"\c- exits";
-                        HUDMSG_FADEOUT, UNLOCK_HBASE - 2, CR_GREEN, 320.4, 460.2,
-                        ((MENU_REFRESH << 16) / 35) + 2.0, 2.0);
             }
+            
+
+            HudMessage(s:"\cf", k:"+forward", s:"\c- scrolls down, \cf", k:"+back", s:"\c- up, \cf",
+                        k:"+use", s:"\c- selects, \cf", k:"+jump", s:"\c- exits";
+                    HUDMSG_FADEOUT, UNLOCK_HBASE - 3, CR_GREEN, 320.4, 460.2,
+                    ((MENU_REFRESH << 16) / 35) + 2.0, 2.0);
+
         }
 
 
@@ -734,7 +752,7 @@ script GENERAL_ACTIVATE (int which)
         int bestNewWeapon;
 
         int weps = getStat(pln, STAT_WEPS);
-
+        
         for (i = 0; i < UNLOCK_WEPCOUNT; i++)
         {
             cBit   = pow(2, i);
@@ -843,6 +861,7 @@ script GENERAL_UNLOCK (int which, int a1, int a2)
         addStat(pln, STAT_ARMORLEVEL, 1);
         break;
     }
+    ACS_ExecuteAlways(GENERAL_ACTIVATE, 0, which, a1, a2);
 }
 
 script GENERAL_CHECK (int which, int a1, int a2)
@@ -893,7 +912,7 @@ script SCALED_CHECK (int base, int check, int scale)
     int quiet = 0;
     int ret = 1;
     int diff;
-
+    int addS = "";
     if (check < 0)
     {
         check = -check;
@@ -905,10 +924,15 @@ script SCALED_CHECK (int base, int check, int scale)
     if (getUnlock(pln, check) < necessaryLevel)
     {
         diff = necessaryLevel - getUnlock(pln, check);
+        
+        if (diff != 1)
+        {
+            addS = "s";
+        }
 
         if (!quiet)
         {
-            Print(s:"\caNeed to unlock \cd", d:necessaryLevel, s:"\ca levels of \ck\"", s:getName(check), s:"\"\ca to unlock this");
+            Print(s:"\caNeed to unlock \cd", d:diff, s:"\ca more level", s:addS, s:" of \ck\"", s:getName(check), s:"\"\ca to unlock this");
         }
 
         ret = 0;
@@ -922,7 +946,6 @@ script PUKE_UNLOCKANDUSE (int which)
     int pln = PlayerNumber();
 
     unlockUnlock(pln, which);
-    applyUnlock(pln, which);
     payForUnlock(pln, which);
 }
 

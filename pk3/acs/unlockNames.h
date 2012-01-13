@@ -31,7 +31,7 @@
 #define MENU_DOWNSPEED      8
 
 #define AMMO_CLIPRATE       55
-#define AMMO_SHELLRATE      145
+#define AMMO_SHELLRATE      245
 #define AMMO_ROCKETRATE     300
 #define AMMO_CELLRATE       70
 

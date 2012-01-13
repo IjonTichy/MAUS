@@ -104,10 +104,6 @@ actor TacDMCommanderKeen: CommanderKeen replaces CommanderKeen
       Death:
         TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
         goto Super::Death
-
-      XDeath:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
-        goto Super::XDeath
     }
 }
 
