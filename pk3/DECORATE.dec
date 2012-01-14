@@ -1,3 +1,4 @@
+#define UNLOCK_MENU        471
 #define LEVEL_ADDXP        481
 #define LEVEL_ADDXP_ONKILL 489
 

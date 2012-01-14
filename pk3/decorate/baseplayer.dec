@@ -1,5 +1,10 @@
 actor UnlockPlayer: DoomPlayer 
 {
+    Player.StartItem "MAUSMenu"
+    Player.StartItem "Pistol"
+    Player.StartItem "Clip", 50
+    Player.StartItem "Fist"
+
     States
     {
       Death:
@@ -14,10 +19,14 @@ actor UnlockPlayer: DoomPlayer
     }
 }
 
-actor IsBot: Inventory
+actor MAUSMenu: CustomInventory
 {
-    +UNDROPPABLE
-    Inventory.MaxAmount 1
+    States
+    {
+      Use:
+        TNT1 A 0 ACS_ExecuteAlways($UNLOCK_MENU, 0, 1,0,0)
+        fail
+    }
 }
 
 actor XPGiver: CustomInventory

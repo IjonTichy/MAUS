@@ -1,3 +1,8 @@
 clearplayerclasses
-
 addplayerclass UnlockPlayer
+
+addkeysection "Modular ACS Unlock System" MAUS
+
+alias unlockmenu "use MAUSMenu"
+defaultbind y unlockmenu
+addmenukey "Show unlock menu" unlockmenu 

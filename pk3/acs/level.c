@@ -102,21 +102,26 @@ function void unlockUnlock(int pln, int num)
 
 function int checkUnlock(int pln, int num, int quiet)
 {
-    int s  = unlockables[num][9];
-    int diff; int addS = "";
+    // THIS IS WHY FUNCTIONS NEED SCOPE
+    SetHudSize(640, 480, 1);
 
+    int s  = unlockables[num][9];
+    int ret; int diff; int addS = "";
+    
     if (getMax(num) <= getUnlock(pln, num) && getMax(num) != -1 )
     {
         if (!quiet)
         {
-            Print(s:"\caAlready at max level for \ck\"", s:getName(num), s:"\"\ca");
+                HudMessage(s:"Already at max";
+                HUDMSG_FADEOUT, UNLOCK_HBASE3, CR_BRICK, 220.4, 130.1 + (MENU_SIZE * MENU_SPACING),
+                    2.0, 1.0);
         }
         return false;
     }
     
     if (s == -1)
     {
-        return true;
+        ret = 1;
     }
     else if (s < 0 || s > 999)
     {
@@ -132,10 +137,13 @@ function int checkUnlock(int pln, int num, int quiet)
     {
         a2 = -a2;
     }
-
-    int ret = ACS_ExecuteWithResult(s, a1,a2,a3);
     
-    if (ret == 1 && getCost(num) > unlocksLeft[pln])
+    if (ret != 1)  // if there's an unlock script
+    {
+        ret = ACS_ExecuteWithResult(s, a1,a2,a3);
+    }
+
+    if (ret == 1 && (getCost(num) > unlocksLeft[pln]))
     {
         diff = getCost(num) - unlocksLeft[pln];
         
@@ -146,7 +154,9 @@ function int checkUnlock(int pln, int num, int quiet)
         
         if (!quiet)
         {
-            Print(s:"\caNeed \cd", d:diff, s:"\ca more unlock", s:addS, s:" available to buy \ck\"", s:getName(num), s:"\"\ca");
+            HudMessage(s:"Need \cd", d:diff, s:"\c- more unlock", s:addS;
+                HUDMSG_FADEOUT, UNLOCK_HBASE3, CR_BRICK, 220.4, 130.1 + (MENU_SIZE * MENU_SPACING),
+                    2.0, 1.0);
         }
         return false;
     }
@@ -196,13 +206,13 @@ function int getArmorIndex(void)
     return -1;
 }
 
-function int oneUnlocked(int pln)
+function int oneUnlocked(int pln, int quiet)
 {
     int i;
-
+    
     for (i = 0; i < UNLOCK_COUNT; i++)
     {
-        if (checkUnlock(pln, i, 0))
+        if (checkUnlock(pln, i, quiet))
         {
             return 1;
         }
@@ -359,7 +369,7 @@ script UNLOCK_DISCONNECT (int pln) disconnect
 }
 
 
-script UNLOCK_MENU (void)
+script UNLOCK_MENU (int alwaysShow)
 {
     int pln = PlayerNumber();
 
@@ -378,8 +388,7 @@ script UNLOCK_MENU (void)
     int tic; int left; int oLeft;
     int name; int current; int cost;
     int msgColor;
-    int startloop;
-    
+
     int selected;
     int oSelected;
 
@@ -387,22 +396,14 @@ script UNLOCK_MENU (void)
     int useScr = MENU_USESPEED;
     int upScr = MENU_UPSPEED;
     int downScr = MENU_DOWNSPEED;
-
-    for (i = 0; i < UNLOCK_COUNT; i++)
-    {
-        if (getUnlock(pln, i) < getMax(i))
-        {
-            startloop = 1;
-            break;
-        }
-    }
-
+    
+    
     // Mainloop
-    while (startloop)
+    while (oneUnlocked(pln, 1) || alwaysShow)
     {
         left = unlocksLeft[pln];
         
-        if (PlayerIsBot(pln) || !left || !oneUnlocked(pln) ) { break; }
+        if (PlayerIsBot(pln) || (!left && !alwaysShow)) { break; }
         
         GiveInventory("SpawnStop", 1);
 
@@ -641,6 +642,12 @@ script UNLOCK_REGEN (void)
 
     while (PlayerInGame(pln))
     {
+        if (GetActorProperty(0, APROP_Health) < 0)
+        {
+            Delay(1);
+            continue;
+        }
+
         hRegenRate = getStat(pln, STAT_HP_REGENRATE);
         aRegenRate = getStat(pln, STAT_AMMO_REGENRATE);
         rRegenRate = getStat(pln, STAT_ARMOR_REGENRATE);
@@ -932,7 +939,7 @@ script GENERAL_CHECK (int which, int a1, int a2)
 {
     int pln = PlayerNumber();
     int quiet; int check; int end;
-    int necessaryLevel; int diff;
+    int diff; int addS = "";
 
     switch (which)
     {
@@ -954,9 +961,19 @@ script GENERAL_CHECK (int which, int a1, int a2)
 
         if (getUnlock(pln, check) < a2)
         {
+            diff = a2 - getUnlock(pln, check);
+            
+            if (diff != 1)
+            {
+                addS = "s";
+            }
+
             if (!quiet)
             {
-                Print(s:"\caNeed to unlock \cd", d:a2, s:"\ca levels of \ck\"", s:getName(a1), s:"\"\ca to unlock this");
+                SetHudSize(640, 480, 1);
+                HudMessage(s:"Need \cd", d:diff, s:"\c- more level", s:addS, s:" of \ck\"", s:getName(a1), s:"\"";
+                    HUDMSG_FADEOUT, UNLOCK_HBASE3, CR_BRICK, 220.4, 130.1 + (MENU_SIZE * MENU_SPACING),
+                        2.0, 1.0);
             }
             end = 0;
         }
@@ -996,7 +1013,10 @@ script SCALED_CHECK (int base, int check, int scale)
 
         if (!quiet)
         {
-            Print(s:"\caNeed to unlock \cd", d:diff, s:"\ca more level", s:addS, s:" of \ck\"", s:getName(check), s:"\"\ca to unlock this");
+            SetHudSize(640, 480, 1);
+            HudMessage(s:"Need \cd", d:diff, s:"\c- more level", s:addS, s:" of \ck\"", s:getName(check), s:"\"";
+                HUDMSG_FADEOUT, UNLOCK_HBASE3, CR_BRICK, 220.4, 130.1 + (MENU_SIZE * MENU_SPACING),
+                    2.0, 1.0);
         }
 
         ret = 0;

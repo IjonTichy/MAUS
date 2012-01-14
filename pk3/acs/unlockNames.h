@@ -1,6 +1,7 @@
 #define UNLOCK_BASE             450
 #define UNLOCK_HBASE            21900
 #define UNLOCK_HBASE2           11900
+#define UNLOCK_HBASE3           16900
 
 #define UNLOCK_ENTER            UNLOCK_BASE-1
 #define UNLOCK_DEATH            UNLOCK_BASE-2
