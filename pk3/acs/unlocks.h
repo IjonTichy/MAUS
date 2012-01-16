@@ -1,6 +1,6 @@
 //#include "unlockNames.h"
 
-#define UNLOCK_COUNT        9
+#define UNLOCK_COUNT        10
 #define ENTRY_COUNT         14
 #define UNLOCK_ARMORCOUNT   3
 #define UNLOCK_WEPCOUNT     13
@@ -33,6 +33,7 @@ int unlockables[UNLOCK_COUNT][ENTRY_COUNT] =
     {GENERAL_ACTIVATE, 6, 0, 0, GENERAL_UNLOCK, 6, 2,UNLOCK_WEPCOUNT-1,10,   GENERAL_CHECK, 0,3,3, 2},
     {GENERAL_ACTIVATE, 7, 0, 0, GENERAL_UNLOCK, 7, UNLOCK_WEPCOUNT-1,0,  1,  GENERAL_CHECK, 0,6,10, 2},
     {-1              , 0, 0, 0, GENERAL_UNLOCK, 8, 1,0,     2,  SCALED_CHECK,   8,5,2, 2},
+    {GENERAL_ACTIVATE, 9, 0, 0, GENERAL_UNLOCK, 9, 1,0,     3,  -1,             0,0,0, 3},
 };
 
 // This is in a seperate array because of ACS bugginess
@@ -47,6 +48,7 @@ int unlockNames[UNLOCK_COUNT] =
     "Random New Weapon",
     "BFG10k",
     "Permanent Armor Upgrade",
+    "Rune Togglers",
 };
 
 int unlockArmors[UNLOCK_ARMORCOUNT] =

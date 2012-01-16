@@ -593,6 +593,7 @@ script UNLOCK_LEVELHUD (void)
     int xp; int oXp;
     int level; int oLevel;
     int nextLevel; int oNextLevel;
+    int left; int oLeft;
 
     SetHudSize(640, 480, 1);
     SetFont("BIGFONT");
@@ -607,8 +608,11 @@ script UNLOCK_LEVELHUD (void)
 
         oNextLevel = nextLevel;
         nextLevel = getStat(pln, STAT_NEXTL);
+        
+        oLeft = left;
+        left = unlocksLeft[pln];
 
-        if ((tic % HUD_REFRESH) == 0 || (xp != oXp) || (level != oLevel) || (nextLevel != oNextLevel))
+        if ((tic % HUD_REFRESH) == 0 || (xp != oXp) || (level != oLevel) || (nextLevel != oNextLevel) || (left != oLeft))
         {
             SetFont("BIGFONT");
             HudMessage(s:"Level \ck", d:level;
@@ -624,7 +628,7 @@ script UNLOCK_LEVELHUD (void)
             HudMessage(d:nextLevel;
                 HUDMSG_FADEOUT, UNLOCK_HBASE2 + 3, CR_GREEN, 555.1, 151.2, ((HUD_REFRESH << 16) / 35) + 2.0, 2.0);
             
-            HudMessage(s:"\cf", d:unlocksLeft[pln], s:"\c- left";
+            HudMessage(s:"\cf", d:left, s:"\c- left";
                 HUDMSG_FADEOUT, UNLOCK_HBASE2 + 5, CR_TAN,  555.2, 125.2, ((HUD_REFRESH << 16) / 35) + 2.0, 2.0);
                 
             tic = 0;
@@ -901,6 +905,27 @@ script GENERAL_ACTIVATE (int which)
             SetWeapon(bestNewWeapon);
         }
         break;
+    
+    case 9:
+        switch (getStat(pln, STAT_RUNELEVEL))
+        {
+        case 3:
+            GiveInventory("DrainRuneToggler", 1);
+            GiveInventory("SpreadRuneToggler", 1);
+            GiveInventory("StrengthRuneToggler", 1);
+
+        case 2:
+            GiveInventory("HighJumpRuneToggler", 1);
+            GiveInventory("RageRuneToggler", 1);
+            GiveInventory("ResistanceRuneToggler", 1);
+
+        case 1:
+            GiveInventory("HasteRuneToggler", 1);
+            GiveInventory("ProsperityRuneToggler", 1);
+            GiveInventory("RegenerationRuneToggler", 1);
+            break;
+        }
+        break;
     }
 }
 
@@ -974,7 +999,11 @@ script GENERAL_UNLOCK (int which, int a1, int a2)
         break;
     
     case 8:
-        addStat(pln, STAT_ARMORLEVEL, 1);
+        addStat(pln, STAT_ARMORLEVEL, a1);
+        break;
+
+    case 9:
+        addStat(pln, STAT_RUNELEVEL, a1);
         break;
     }
     ACS_ExecuteAlways(GENERAL_ACTIVATE, 0, which, a1, a2);
