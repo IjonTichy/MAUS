@@ -16,6 +16,9 @@
 
 #define UNLOCK_MENU             UNLOCK_BASE+21
 #define UNLOCK_LEVELHUD         UNLOCK_BASE+22
+#define UNLOCK_NAG              UNLOCK_BASE+23
+
+#define LEVELEFFECT_MAX         5
 
 #define LEVEL_ADDXP             UNLOCK_BASE+31
 #define LEVEL_RECALC            UNLOCK_BASE+32
@@ -32,6 +35,10 @@
 #define MENU_DOWNSPEED      8
 #define MENU_SIZE           10
 #define MENU_SPACING        11.0
+
+#define XPQ_A               12.5 
+#define XPQ_B               37.5
+#define XPQ_C               0
 
 #define AMMO_CLIPRATE       55
 #define AMMO_SHELLRATE      245

@@ -15,6 +15,7 @@ global int 5:startStats[];
 
 int uMenuLock[32];
 int hasEntered[32];
+int nagForMenu[32];
 
 function int getName(int num)
 {
@@ -373,16 +374,6 @@ script UNLOCK_MENU (int alwaysShow)
 {
     int pln = PlayerNumber();
 
-    if (uMenuLock[pln])
-    {
-        terminate;
-    }
-
-    SetHudSize(640, 480, 1);
-
-    uMenuLock[pln] = 1;
-    GiveInventory("SpawnProtection", 1);
-    
     int i; int j;
     int refresh; int top;
     int tic; int left; int oLeft;
@@ -397,13 +388,24 @@ script UNLOCK_MENU (int alwaysShow)
     int upScr = MENU_UPSPEED;
     int downScr = MENU_DOWNSPEED;
     
+    if (uMenuLock[pln])
+    {
+        terminate;
+    }
+
+    SetHudSize(640, 480, 1);
+
+    uMenuLock[pln] = 1;
+    nagForMenu[pln] = -1;
+    
+    if (!alwaysShow) { GiveInventory("SpawnProtection", 1); }
     
     // Mainloop
     while (oneUnlocked(pln, 1) || alwaysShow)
     {
         left = unlocksLeft[pln];
         
-        if (PlayerIsBot(pln) || (!left && !alwaysShow)) { break; }
+        if (PlayerIsBot(pln) || (!left && !alwaysShow) || keyDown(BT_JUMP)) { break; }
         
         GiveInventory("SpawnStop", 1);
 
@@ -487,7 +489,7 @@ script UNLOCK_MENU (int alwaysShow)
 
             SetFont("BIGFONT");
 
-            HudMessage(s:"\cfLEVEL UP\c- - \cd", d:left, s:"\c- left";
+            HudMessage(s:"UNLOCK MENU";
                 HUDMSG_FADEOUT, UNLOCK_HBASE - 1, CR_WHITE, 220.4, 34.1, ((MENU_REFRESH << 16) / 35) + 2.0, 2.0);
             
             SetFont("SMALLFONT");
@@ -530,7 +532,7 @@ script UNLOCK_MENU (int alwaysShow)
             HudMessage(s:"Cost";    HUDMSG_FADEOUT, FIELDBASE - 3, CR_TAN,       305.4, POS_Y,      REFRESHRATE, 2.0);
            
 
-            HudMessage(s:"\cf", k:"+forward", s:"\c- scrolls up, \cf", k:"+back", s:"\c- down, \cf", k:"+use", s:"\c- selects";
+            HudMessage(s:"\cf", k:"+forward", s:"\c- scrolls up, \cf", k:"+back", s:"\c- down, \cf", k:"+use", s:"\c- selects, \cf", k:"+jump", s:"\c- exits";
                     HUDMSG_FADEOUT, UNLOCK_HBASE - 3, CR_GREEN, 220.4, 50.1,
                     ((MENU_REFRESH << 16) / 35) + 2.0, 2.0);
             
@@ -579,6 +581,7 @@ script UNLOCK_MENU (int alwaysShow)
     }
 
     GiveInventory("EndSpawnProtection", 1);
+    nagForMenu[pln] = 0;
     uMenuLock[pln] = 0;
 }
 
@@ -612,20 +615,50 @@ script UNLOCK_LEVELHUD (void)
                 HUDMSG_FADEOUT, UNLOCK_HBASE2 + 1, CR_GREY, 480.1, 110.2, ((HUD_REFRESH << 16) / 35) + 2.0, 2.0);
 
             HudMessage(s:"/";
-                HUDMSG_FADEOUT, UNLOCK_HBASE2 + 4, CR_GOLD, 554.4, 135.2, ((HUD_REFRESH << 16) / 35) + 2.0, 2.0);
+                HUDMSG_FADEOUT, UNLOCK_HBASE2 + 4, CR_DARKRED, 554.4, 145.2, ((HUD_REFRESH << 16) / 35) + 2.0, 2.0);
 
             SetFont("SMALLFONT");
             HudMessage(s:"XP: \cd", d:xp;
-                HUDMSG_FADEOUT, UNLOCK_HBASE2 + 2, CR_WHITE, 510.1, 130.2, ((HUD_REFRESH << 16) / 35) + 2.0, 2.0);
+                HUDMSG_FADEOUT, UNLOCK_HBASE2 + 2, CR_WHITE, 510.1, 140.2, ((HUD_REFRESH << 16) / 35) + 2.0, 2.0);
             
             HudMessage(d:nextLevel;
-                HUDMSG_FADEOUT, UNLOCK_HBASE2 + 3, CR_GREEN, 555.1, 141.2, ((HUD_REFRESH << 16) / 35) + 2.0, 2.0);
-
+                HUDMSG_FADEOUT, UNLOCK_HBASE2 + 3, CR_GREEN, 555.1, 151.2, ((HUD_REFRESH << 16) / 35) + 2.0, 2.0);
+            
+            HudMessage(s:"\cf", d:unlocksLeft[pln], s:"\c- left";
+                HUDMSG_FADEOUT, UNLOCK_HBASE2 + 5, CR_TAN,  555.2, 125.2, ((HUD_REFRESH << 16) / 35) + 2.0, 2.0);
+                
             tic = 0;
         }
 
         tic++;
         Delay(1);
+    }
+}
+
+script UNLOCK_NAG (void)
+{
+    int pln = PlayerNumber();
+    
+    SetHudSize(640, 480, 1);
+    
+    if (nagForMenu[pln] == 1) { terminate; }
+
+    if (nagForMenu[pln] == -1)
+    {
+        HudMessage(s:"You leveled up!";
+            HUDMSG_FADEOUT, UNLOCK_HBASE2 + 50, CR_GOLD, 320.4, 30.2, 0.5, 1.0);
+        
+        terminate;
+    }
+    
+    nagForMenu[pln] = 1;
+    
+    while (nagForMenu[pln] == 1)
+    {
+        HudMessage(s:"You leveled up! Press \ck\"", k:"unlockmenu", s:"\"\c- to use it";
+            HUDMSG_FADEOUT, UNLOCK_HBASE2 + 50, CR_GOLD, 320.4, 30.2, 0.2, 1.0);
+
+        Delay(35);
     }
 }
 
@@ -730,8 +763,9 @@ script LEVEL_RECALC (int pln)
     int level  = getStat(pln, STAT_LEVEL);
     int next   = getStat(pln, STAT_NEXTL);
     int leveled;
+    int i; int j;
 
-    while (xp > next)
+    while (xp >= next)
     {
         xp -= next;
 
@@ -742,14 +776,25 @@ script LEVEL_RECALC (int pln)
         next += 25;
     }
 
-    if (leveled)
-    {
-        ACS_ExecuteAlways(UNLOCK_MENU, 0, 0,0,0);
-    }
-
     setStat(pln, STAT_XP, xp);
     setStat(pln, STAT_LEVEL, level);
     setStat(pln, STAT_NEXTL, next);
+
+    if (leveled)
+    {
+        ACS_ExecuteAlways(UNLOCK_NAG, 0, 0,0,0);
+        
+        leveled = min(leveled, LEVELEFFECT_MAX);
+        
+        for (i = 0; i < 70; i++)
+        {
+            for (j = 0; j < leveled; j++)
+            {
+                GiveInventory("LevelUpEffect", 1);
+            }
+            Delay(1);
+        }
+    }
 }
 
 script LEVEL_ADDXP_ONKILL (int isMonster, int amount)
