@@ -49,7 +49,7 @@
 #define ARMOR_REGENRATE     81
 
 // BEHOLD! A way to cram too many values into one global array!
-#define STAT_COUNT              13
+#define STAT_COUNT              14
 
 #define STAT_HP                 0
 #define STAT_SPEED              1
@@ -64,3 +64,4 @@
 #define STAT_ARMOR_REGENRATE    10
 #define STAT_ARMORLEVEL         11
 #define STAT_RUNELEVEL          12
+#define STAT_KILLSTREAKCOUNTER  13

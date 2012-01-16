@@ -293,6 +293,7 @@ script UNLOCK_ENTER enter
     int i; int weps; int wepName;
 
     hasEntered[pln] = 1;
+    GiveInventory("EndSpawnProtection", 1);
 
     if (!inGame[pln])
     {
@@ -388,16 +389,18 @@ script UNLOCK_MENU (int alwaysShow)
     int upScr = MENU_UPSPEED;
     int downScr = MENU_DOWNSPEED;
     
-    if (uMenuLock[pln])
+    if (uMenuLock[pln] == 1)
     {
+        uMenuLock[pln] = 2;
+        GiveInventory("EndSpawnProtection", 1);
         terminate;
     }
-
+    
     SetHudSize(640, 480, 1);
 
     uMenuLock[pln] = 1;
     nagForMenu[pln] = -1;
-    
+     
     if (!alwaysShow) { GiveInventory("SpawnProtection", 1); }
     
     // Mainloop
@@ -405,7 +408,7 @@ script UNLOCK_MENU (int alwaysShow)
     {
         left = unlocksLeft[pln];
         
-        if (PlayerIsBot(pln) || (!left && !alwaysShow) || keyDown(BT_JUMP)) { break; }
+        if ((!left && !alwaysShow) || uMenuLock[pln] == 2) { break; }
         
         GiveInventory("SpawnStop", 1);
 
@@ -532,7 +535,7 @@ script UNLOCK_MENU (int alwaysShow)
             HudMessage(s:"Cost";    HUDMSG_FADEOUT, FIELDBASE - 3, CR_TAN,       305.4, POS_Y,      REFRESHRATE, 2.0);
            
 
-            HudMessage(s:"\cf", k:"+forward", s:"\c- scrolls up, \cf", k:"+back", s:"\c- down, \cf", k:"+use", s:"\c- selects, \cf", k:"+jump", s:"\c- exits";
+            HudMessage(s:"\cf", k:"+forward", s:"\c- scrolls up, \cf", k:"+back", s:"\c- down, \cf", k:"+use", s:"\c- selects, \cf", k:"unlockmenu", s:"\c- exits";
                     HUDMSG_FADEOUT, UNLOCK_HBASE - 3, CR_GREEN, 220.4, 50.1,
                     ((MENU_REFRESH << 16) / 35) + 2.0, 2.0);
             
@@ -563,23 +566,7 @@ script UNLOCK_MENU (int alwaysShow)
         
         Delay(1);
     }
-
-    if (PlayerIsBot(pln))
-    {
-        while (unlocksLeft[pln] != 0)
-        {
-            selected = Random(0, UNLOCK_COUNT);
-
-            while (!checkUnlock(pln, selected, 1))
-            {
-                selected = Random(0, UNLOCK_COUNT);
-            }
-
-            unlocksLeft[pln]--;
-            unlockUnlock(pln, selected);
-        }
-    }
-
+    
     GiveInventory("EndSpawnProtection", 1);
     nagForMenu[pln] = 0;
     uMenuLock[pln] = 0;
@@ -642,6 +629,24 @@ script UNLOCK_LEVELHUD (void)
 script UNLOCK_NAG (void)
 {
     int pln = PlayerNumber();
+
+    if (PlayerIsBot(pln))
+    {
+        while (unlocksLeft[pln] != 0)
+        {
+            int selected = Random(0, UNLOCK_COUNT);
+
+            while (!checkUnlock(pln, selected, 1))
+            {
+                selected = Random(0, UNLOCK_COUNT);
+            }
+
+            unlocksLeft[pln]--;
+            unlockUnlock(pln, selected);
+        
+            Delay(1);
+        }
+    }
     
     SetHudSize(640, 480, 1);
     
@@ -811,10 +816,11 @@ script LEVEL_ADDXP_ONKILL (int isMonster, int amount)
 
     int killerPln = PlayerNumber();
     int killerTeam = GetPlayerInfo(killerPln, PLAYERINFO_TEAM);
+    int curStreak; int nowStreak;
 
     if (!amount)
     {
-        amount = 5 + (getStat(killedPln, STAT_TOTALXP) / 2);
+        amount = 5 + max((getStat(killedPln, STAT_TOTALXP) - getStat(killerPln, STAT_TOTALXP)) / 2, 0);
     }
 
     if (killerPln == -1)  // m-m-m-m-m-monster kill
@@ -829,6 +835,8 @@ script LEVEL_ADDXP_ONKILL (int isMonster, int amount)
     }
     else
     {
+        amount *= getStat(killerPln, STAT_KILLSTREAKCOUNTER) + 1;
+
         if (killedTeam == killerTeam)
         {
             if ((killedTeam == 4) && (killedPln != killerPln))
@@ -839,6 +847,16 @@ script LEVEL_ADDXP_ONKILL (int isMonster, int amount)
         else
         {
             ACS_ExecuteAlways(LEVEL_ADDXP, 0, killerPln, amount, 0);
+        }
+
+        addStat(killerPln, STAT_KILLSTREAKCOUNTER, 1);
+        curStreak = getStat(killerPln, STAT_KILLSTREAKCOUNTER);
+        Delay(105);
+        nowStreak = getStat(killerPln, STAT_KILLSTREAKCOUNTER);
+    
+        if (curStreak == nowStreak)
+        {
+            setStat(killerPln, STAT_KILLSTREAKCOUNTER, 0);
         }
     }
 }
