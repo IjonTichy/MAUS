@@ -74,7 +74,7 @@ function int adjustBottom(int tmin, int tmax, int i)
 {
     if (i < tmin) { tmin = i; }
     if (i > tmax) { tmin += (i - tmax); }
-    
+
     return tmin;
 }
 
@@ -82,19 +82,19 @@ function int adjustTop(int tmin, int tmax, int i)
 {
     if (i < tmin) { tmax -= (tmin - i); }
     if (i > tmax) { tmax = i; }
-    
+
     return tmax;
 }
 
 // Taken from http://zdoom.org/wiki/Sqrt
-function int sqrt(int number) 
+function int sqrt(int number)
 {
     if (number == 1.0) { return 1.0;  }
     if (number <= 0) { return 0; }
     int val = 150.0;
     for (int i=0; i<15; i++) { val = (val + FixedDiv(number, val)) >> 1; }
 
-    return val; 
+    return val;
 }
 
 function int quadPos(int a, int b, int c)
@@ -102,7 +102,7 @@ function int quadPos(int a, int b, int c)
     int s1 = sqrt(FixedMul(b, b)-(4*FixedMul(a, c)));
     int s2 = (2 * a);
     int b1 = FixedDiv(-b + s1, s2);
-    
+
     return b1;
 }
 
@@ -111,7 +111,7 @@ function int quadNeg(int a, int b, int c)
     int s1 = sqrt(FixedMul(b, b)-(4*FixedMul(a, c)));
     int s2 = (2 * a);
     int b1 = FixedDiv(-b - s1, s2);
-    
+
     return b1;
 }
 

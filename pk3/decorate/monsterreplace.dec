@@ -1,61 +1,61 @@
-actor TacDMZombieman: Zombieman replaces Zombieman
+actor MAUSZombieman: Zombieman replaces Zombieman
 {
     States
     {
       Death.Massacre:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
+        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 2, 0)
         TNT1 A 0 A_NoBlocking
         stop
 
       Death:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
+        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 2, 0)
         goto Super::Death
 
       XDeath:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
+        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 2, 0)
         goto Super::XDeath
     }
 }
 
-actor TacDMShotgunGuy: ShotgunGuy replaces ShotgunGuy
+actor MAUSShotgunGuy: ShotgunGuy replaces ShotgunGuy
 {
     States
     {
       Death.Massacre:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
+        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 2, 0)
         TNT1 A 0 A_NoBlocking
         stop
 
       Death:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
+        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 2, 0)
         goto Super::Death
 
       XDeath:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
+        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 2, 0)
         goto Super::XDeath
     }
 }
 
-actor TacDMChaingunGuy: ChaingunGuy replaces ChaingunGuy
+actor MAUSChaingunGuy: ChaingunGuy replaces ChaingunGuy
 {
     States
     {
       Death.Massacre:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
+        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 2, 0)
         TNT1 A 0 A_NoBlocking
         stop
 
       Death:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
+        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 2, 0)
         goto Super::Death
 
       XDeath:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
+        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 2, 0)
         goto Super::XDeath
     }
 }
 
-actor TacDMSuperShotgunGuy: SuperShotgunGuy replaces SuperShotgunGuy
+actor MAUSSuperShotgunGuy: SuperShotgunGuy replaces SuperShotgunGuy
 {
     States
     {
@@ -64,69 +64,69 @@ actor TacDMSuperShotgunGuy: SuperShotgunGuy replaces SuperShotgunGuy
         stop
 
       Death:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
+        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 2, 0)
         goto Super::Death
 
       XDeath:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
+        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 2, 0)
         goto Super::XDeath
     }
 }
 
-actor TacDMNazi: WolfensteinSS replaces WolfensteinSS
+actor MAUSNazi: WolfensteinSS replaces WolfensteinSS
 {
     States
     {
       Death.Massacre:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
+        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 2, 0)
         TNT1 A 0 A_NoBlocking
         stop
 
       Death:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
+        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 2, 0)
         goto Super::Death
 
       XDeath:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
+        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 2, 0)
         goto Super::XDeath
     }
 }
 
-actor TacDMCommanderKeen: CommanderKeen replaces CommanderKeen
+actor MAUSCommanderKeen: CommanderKeen replaces CommanderKeen
 {
     States
     {
       Death.Massacre:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
+        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 2, 0)
         TNT1 A 0 A_NoBlocking
         stop
 
       Death:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
+        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 2, 0)
         goto Super::Death
     }
 }
 
-actor TacDMDoomImp: DoomImp replaces DoomImp
+actor MAUSDoomImp: DoomImp replaces DoomImp
 {
     States
     {
       Death.Massacre:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
+        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 2, 0)
         TNT1 A 0 A_NoBlocking
         stop
 
       Death:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
+        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 2, 0)
         goto Super::Death
 
       XDeath:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
+        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 2, 0)
         goto Super::XDeath
     }
 }
 
-actor TacDMDarkImp: DarkImp replaces DarkImp
+actor MAUSDarkImp: DarkImp replaces DarkImp
 {
     States
     {
@@ -135,271 +135,271 @@ actor TacDMDarkImp: DarkImp replaces DarkImp
         stop
 
       Death:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
+        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 2, 0)
         goto Super::Death
 
       XDeath:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
+        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 2, 0)
         goto Super::XDeath
     }
 }
 
-actor TacDMDemon: Demon replaces Demon
+actor MAUSDemon: Demon replaces Demon
 {
     States
     {
       Death.Massacre:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
+        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 2, 0)
         TNT1 A 0 A_NoBlocking
         stop
 
       Death:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
+        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 2, 0)
         goto Super::Death
     }
 }
 
-actor TacDMSpectre: TacDMDemon replaces Spectre
+actor MAUSSpectre: MAUSDemon replaces Spectre
 {
     RenderStyle Fuzzy
 }
 
-actor TacDMBloodDemon: BloodDemon replaces BloodDemon
+actor MAUSBloodDemon: BloodDemon replaces BloodDemon
 {
     States
     {
       Death.Massacre:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
+        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 2, 0)
         TNT1 A 0 A_NoBlocking
         stop
 
       Death:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
+        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 2, 0)
         goto Super::Death
     }
 }
 
-actor TacDMCacodemon: Cacodemon replaces Cacodemon
+actor MAUSCacodemon: Cacodemon replaces Cacodemon
 {
     States
     {
       Death.Massacre:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
+        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 2, 0)
         TNT1 A 0 A_NoBlocking
         stop
 
       Death:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
+        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 2, 0)
         goto Super::Death
     }
 }
 
-actor TacDMCacolantern: Cacolantern replaces Cacolantern
+actor MAUSCacolantern: Cacolantern replaces Cacolantern
 {
     States
     {
       Death.Massacre:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
+        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 2, 0)
         TNT1 A 0 A_NoBlocking
         stop
 
       Death:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
+        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 2, 0)
         goto Super::Death
     }
 }
 
-actor TacDMAbaddon: Abaddon replaces Abaddon
+actor MAUSAbaddon: Abaddon replaces Abaddon
 {
     States
     {
       Death.Massacre:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
+        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 2, 0)
         TNT1 A 0 A_NoBlocking
         stop
 
       Death:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
+        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 2, 0)
         goto Super::Death
     }
 }
 
-actor TacDMLostSoul: LostSoul replaces LostSoul
+actor MAUSLostSoul: LostSoul replaces LostSoul
 {
     States
     {
       Death.Massacre:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
+        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 2, 0)
         TNT1 A 0 A_NoBlocking
         stop
 
       Death:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
+        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 2, 0)
         goto Super::Death
     }
 }
 
-actor TacDMPainElemental: PainElemental replaces PainElemental
+actor MAUSPainElemental: PainElemental replaces PainElemental
 {
     States
     {
       Death.Massacre:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
+        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 2, 0)
         TNT1 A 0 A_NoBlocking
         stop
 
       Death:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
+        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 2, 0)
         goto Super::Death
     }
 }
 
-actor TacDMRevenant: Revenant replaces Revenant
+actor MAUSRevenant: Revenant replaces Revenant
 {
     States
     {
       Death.Massacre:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
+        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 2, 0)
         TNT1 A 0 A_NoBlocking
         stop
 
       Death:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
+        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 2, 0)
         goto Super::Death
     }
 }
 
-actor TacDMFatso: Fatso replaces Fatso
+actor MAUSFatso: Fatso replaces Fatso
 {
     States
     {
       Death.Massacre:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
+        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 2, 0)
         TNT1 A 0 A_NoBlocking
         stop
 
       Death:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
+        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 2, 0)
         goto Super::Death
     }
 }
 
-actor TacDMHectebus: Hectebus replaces Hectebus
+actor MAUSHectebus: Hectebus replaces Hectebus
 {
     States
     {
       Death.Massacre:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
+        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 2, 0)
         TNT1 A 0 A_NoBlocking
         stop
 
       Death:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
+        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 2, 0)
         goto Super::Death
     }
 }
 
-actor TacDMArachnotron: Arachnotron replaces Arachnotron
+actor MAUSArachnotron: Arachnotron replaces Arachnotron
 {
     States
     {
       Death.Massacre:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
+        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 2, 0)
         TNT1 A 0 A_NoBlocking
         stop
 
       Death:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
+        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 2, 0)
         goto Super::Death
     }
 }
 
-actor TacDMHellKnight: HellKnight replaces HellKnight
+actor MAUSHellKnight: HellKnight replaces HellKnight
 {
     States
     {
       Death.Massacre:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
+        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 2, 0)
         TNT1 A 0 A_NoBlocking
         stop
 
       Death:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
+        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 2, 0)
         goto Super::Death
     }
 }
 
-actor TacDMBaronOfHell: BaronOfHell replaces BaronOfHell
+actor MAUSBaronOfHell: BaronOfHell replaces BaronOfHell
 {
     States
     {
       Death.Massacre:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
+        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 2, 0)
         TNT1 A 0 A_NoBlocking
         stop
 
       Death:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
+        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 2, 0)
         goto Super::Death
     }
 }
 
-actor TacDMBelphegor: Belphegor replaces Belphegor
+actor MAUSBelphegor: Belphegor replaces Belphegor
 {
     States
     {
       Death.Massacre:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
+        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 2, 0)
         TNT1 A 0 A_NoBlocking
         stop
 
       Death:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
+        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 2, 0)
         goto Super::Death
     }
 }
 
-actor TacDMArchVile: ArchVile replaces ArchVile
+actor MAUSArchVile: ArchVile replaces ArchVile
 {
     States
     {
       Death.Massacre:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
+        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 2, 0)
         TNT1 A 0 A_NoBlocking
         stop
 
       Death:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
+        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 2, 0)
         goto Super::Death
     }
 }
 
-actor TacDMCyberdemon: Cyberdemon replaces Cyberdemon
+actor MAUSCyberdemon: Cyberdemon replaces Cyberdemon
 {
     States
     {
       Death.Massacre:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
+        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 2, 0)
         TNT1 A 0 A_NoBlocking
         stop
 
       Death:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
+        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 2, 0)
         goto Super::Death
     }
 }
 
-actor TacDMSpiderMastermind: SpiderMastermind replaces SpiderMastermind
+actor MAUSSpiderMastermind: SpiderMastermind replaces SpiderMastermind
 {
     States
     {
       Death.Massacre:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
+        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 2, 0)
         TNT1 A 0 A_NoBlocking
         stop
 
       Death:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 0, 0)
+        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP_ONKILL, 0, 1, 2, 0)
         goto Super::Death
     }
 }

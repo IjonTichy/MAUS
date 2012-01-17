@@ -108,7 +108,7 @@ function int checkUnlock(int pln, int num, int quiet)
 
     int s  = unlockables[num][9];
     int ret; int diff; int addS = "";
-    
+
     if (getMax(num) <= getUnlock(pln, num) && getMax(num) != -1 )
     {
         if (!quiet)
@@ -119,7 +119,7 @@ function int checkUnlock(int pln, int num, int quiet)
         }
         return false;
     }
-    
+
     if (s == -1)
     {
         ret = 1;
@@ -138,7 +138,7 @@ function int checkUnlock(int pln, int num, int quiet)
     {
         a2 = -a2;
     }
-    
+
     if (ret != 1)  // if there's an unlock script
     {
         ret = ACS_ExecuteWithResult(s, a1,a2,a3);
@@ -147,12 +147,12 @@ function int checkUnlock(int pln, int num, int quiet)
     if (ret == 1 && (getCost(num) > unlocksLeft[pln]))
     {
         diff = getCost(num) - unlocksLeft[pln];
-        
+
         if (diff != 1)
         {
             addS = "s";
         }
-        
+
         if (!quiet)
         {
             HudMessage(s:"Need \cd", d:diff, s:"\c- more unlock", s:addS;
@@ -161,7 +161,7 @@ function int checkUnlock(int pln, int num, int quiet)
         }
         return false;
     }
-    
+
     return ret;
 }
 
@@ -210,7 +210,7 @@ function int getArmorIndex(void)
 function int oneUnlocked(int pln, int quiet)
 {
     int i;
-    
+
     for (i = 0; i < UNLOCK_COUNT; i++)
     {
         if (checkUnlock(pln, i, quiet))
@@ -218,7 +218,7 @@ function int oneUnlocked(int pln, int quiet)
             return 1;
         }
     }
-    
+
     return 0;
 }
 
@@ -262,23 +262,23 @@ function void printMenuItem(int pln, int pos, int which, int selected)
     int REFRESHRATE = ((MENU_REFRESH << 16) / 35) + 2.0;
 
     HudMessage(s:name; HUDMSG_FADEOUT, FIELDBASE, nameColor, 215.2, POS_Y, REFRESHRATE, 2.0);
-    
+
     if (l_max == -1)
     {
-        HudMessage(s:"---"; HUDMSG_FADEOUT, FIELDBASE + 1, maxColor, 245.4, POS_Y, REFRESHRATE, 2.0); 
+        HudMessage(s:"---"; HUDMSG_FADEOUT, FIELDBASE + 1, maxColor, 245.4, POS_Y, REFRESHRATE, 2.0);
     }
     else
     {
-        HudMessage(d:l_max; HUDMSG_FADEOUT, FIELDBASE + 1, maxColor, 245.4, POS_Y, REFRESHRATE, 2.0); 
+        HudMessage(d:l_max; HUDMSG_FADEOUT, FIELDBASE + 1, maxColor, 245.4, POS_Y, REFRESHRATE, 2.0);
     }
 
     if (l_max == current)
     {
-        HudMessage(s:"MAX"; HUDMSG_FADEOUT, FIELDBASE + 2, curColor, 275.4, POS_Y, REFRESHRATE, 2.0); 
+        HudMessage(s:"MAX"; HUDMSG_FADEOUT, FIELDBASE + 2, curColor, 275.4, POS_Y, REFRESHRATE, 2.0);
     }
     else
     {
-        HudMessage(d:current; HUDMSG_FADEOUT, FIELDBASE + 2, curColor, 275.4, POS_Y, REFRESHRATE, 2.0); 
+        HudMessage(d:current; HUDMSG_FADEOUT, FIELDBASE + 2, curColor, 275.4, POS_Y, REFRESHRATE, 2.0);
     }
 
     HudMessage(d:cost; HUDMSG_FADEOUT, FIELDBASE + 3, costColor, 305.4, POS_Y, REFRESHRATE, 2.0);
@@ -290,7 +290,7 @@ function void printMenuItem(int pln, int pos, int which, int selected)
 script UNLOCK_ENTER enter
 {
     int pln = PlayerNumber();
-    int i; int weps; int wepName;
+    int i; int hp; int weps; int wepName;
 
     hasEntered[pln] = 1;
     GiveInventory("EndSpawnProtection", 1);
@@ -298,7 +298,14 @@ script UNLOCK_ENTER enter
     if (!inGame[pln])
     {
         inGame[pln] = 1;
-        int hp = GetActorProperty(0, APROP_SpawnHealth);
+
+        // I'm lazy
+        for (i = 0; i < STAT_COUNT; i++)
+        {
+            setStat(pln, i, 0);
+        }
+
+        hp = GetActorProperty(0, APROP_SpawnHealth);
 
         if (hp != 0)
         {
@@ -312,12 +319,8 @@ script UNLOCK_ENTER enter
 
         setStat(pln, STAT_SPEED, GetActorProperty(0, APROP_Speed));
         setStat(pln, STAT_JUMPZ, GetActorProperty(0, APROP_JumpZ));
-        setStat(pln, STAT_XP, 0);
         setStat(pln, STAT_LEVEL, 1);
         setStat(pln, STAT_NEXTL, 50);
-        setStat(pln, STAT_HP_REGENRATE, 0);
-        setStat(pln, STAT_AMMO_REGENRATE, 0);
-        setStat(pln, STAT_ARMOR_REGENRATE, 0);
 
         for (i = 0; i < UNLOCK_WEPCOUNT; i++)
         {
@@ -388,28 +391,28 @@ script UNLOCK_MENU (int alwaysShow)
     int useScr = MENU_USESPEED;
     int upScr = MENU_UPSPEED;
     int downScr = MENU_DOWNSPEED;
-    
+
     if (uMenuLock[pln] == 1)
     {
         uMenuLock[pln] = 2;
         GiveInventory("EndSpawnProtection", 1);
         terminate;
     }
-    
+
     SetHudSize(640, 480, 1);
 
     uMenuLock[pln] = 1;
     nagForMenu[pln] = -1;
-     
+
     if (!alwaysShow) { GiveInventory("SpawnProtection", 1); }
-    
+
     // Mainloop
     while (oneUnlocked(pln, 1) || alwaysShow)
     {
         left = unlocksLeft[pln];
-        
+
         if ((!left && !alwaysShow) || uMenuLock[pln] == 2) { break; }
-        
+
         GiveInventory("SpawnStop", 1);
 
         if (keyDown(BT_USE))
@@ -418,7 +421,7 @@ script UNLOCK_MENU (int alwaysShow)
             {
                 usekey = useScr;
                 useScr = max(1, useScr - 1);
-                
+
                 if (selected == UNLOCK_COUNT)
                 {
                     break;
@@ -437,7 +440,7 @@ script UNLOCK_MENU (int alwaysShow)
             usekey = 0;
             useScr = MENU_USESPEED;
         }
-        
+
         // Begin scrolling
         if (keyDown(BT_FORWARD))
         {
@@ -467,20 +470,20 @@ script UNLOCK_MENU (int alwaysShow)
             downScr = MENU_DOWNSPEED;
         }
 
-        if (upScr == 1) { selected -= (upkey / upScr); } 
+        if (upScr == 1) { selected -= (upkey / upScr); }
         else { selected -= (upkey / (upScr + 1)); }
 
         if (downScr == 1) { selected += (downkey / downScr); }
         else { selected += (downkey / (downScr + 1)); }
         // End scrolling
-        
+
         selected = mod(selected, UNLOCK_COUNT+1);
-        
+
         if ((tic % MENU_REFRESH == 0) || (oSelected != selected) || (oLeft != left) || (refresh))
         {
             tic = 0;
             refresh = 0;
-           
+
             if (selected == UNLOCK_COUNT)
             {
                 top = adjustBottom(top, top+MENU_SIZE-1, 0);
@@ -494,7 +497,7 @@ script UNLOCK_MENU (int alwaysShow)
 
             HudMessage(s:"UNLOCK MENU";
                 HUDMSG_FADEOUT, UNLOCK_HBASE - 1, CR_WHITE, 220.4, 34.1, ((MENU_REFRESH << 16) / 35) + 2.0, 2.0);
-            
+
             SetFont("SMALLFONT");
 
             if (top > 0)
@@ -521,29 +524,29 @@ script UNLOCK_MENU (int alwaysShow)
                 HudMessage(s:"";
                         HUDMSG_FADEOUT, UNLOCK_HBASE - 6, CR_GOLD, 320.4, 110.1,
                         ((MENU_REFRESH << 16) / 35) + 2.0, 2.0);
-            } 
+            }
 
-            
+
             // For convenience
             int FIELDBASE   = UNLOCK_HBASE - 100;
             int POS_Y       = 84.1;
             int REFRESHRATE = ((MENU_REFRESH << 16) / 35) + 2.0;
 
             HudMessage(s:"Name";    HUDMSG_FADEOUT, FIELDBASE,     CR_GOLD,      155.4, POS_Y+10.0, REFRESHRATE, 2.0);
-            HudMessage(s:"Max";     HUDMSG_FADEOUT, FIELDBASE - 1, CR_LIGHTBLUE, 245.4, POS_Y,      REFRESHRATE, 2.0); 
-            HudMessage(s:"Current"; HUDMSG_FADEOUT, FIELDBASE - 2, CR_GREEN,     275.4, POS_Y+10.0, REFRESHRATE, 2.0); 
+            HudMessage(s:"Max";     HUDMSG_FADEOUT, FIELDBASE - 1, CR_LIGHTBLUE, 245.4, POS_Y,      REFRESHRATE, 2.0);
+            HudMessage(s:"Current"; HUDMSG_FADEOUT, FIELDBASE - 2, CR_GREEN,     275.4, POS_Y+10.0, REFRESHRATE, 2.0);
             HudMessage(s:"Cost";    HUDMSG_FADEOUT, FIELDBASE - 3, CR_TAN,       305.4, POS_Y,      REFRESHRATE, 2.0);
-           
+
 
             HudMessage(s:"\cf", k:"+forward", s:"\c- scrolls up, \cf", k:"+back", s:"\c- down, \cf", k:"+use", s:"\c- selects, \cf", k:"unlockmenu", s:"\c- exits";
                     HUDMSG_FADEOUT, UNLOCK_HBASE - 3, CR_GREEN, 220.4, 50.1,
                     ((MENU_REFRESH << 16) / 35) + 2.0, 2.0);
-            
+
             // (x of y)
             HudMessage(s:"\(\cd", d:mod(selected+1, UNLOCK_COUNT+1), s:"\c- of \cf", d:UNLOCK_COUNT, s:"\c-)";
                     HUDMSG_FADEOUT, UNLOCK_HBASE - 4, CR_DARKGREY, 220.4, 110.1 + (MENU_SIZE * MENU_SPACING),
                     ((MENU_REFRESH << 16) / 35) + 2.0, 2.0);
-            
+
 
 
             if (selected == UNLOCK_COUNT) { msgColor = CR_BRICK; }
@@ -551,7 +554,7 @@ script UNLOCK_MENU (int alwaysShow)
 
             HudMessage(s:"Exit unlock menu";
                 HUDMSG_FADEOUT, UNLOCK_HBASE - 2, msgColor, 220.4, 70.1, ((MENU_REFRESH << 16) / 35) + 2.0, 2.0);
-            
+
             for (i = 0; i < min(MENU_SIZE, UNLOCK_COUNT); i++)
             {
                 j = mod(i + top, UNLOCK_COUNT);
@@ -563,10 +566,10 @@ script UNLOCK_MENU (int alwaysShow)
         oLeft     = left;
         oSelected = selected;
         usekey--; upkey--; downkey--;
-        
+
         Delay(1);
     }
-    
+
     GiveInventory("EndSpawnProtection", 1);
     nagForMenu[pln] = 0;
     uMenuLock[pln] = 0;
@@ -595,7 +598,7 @@ script UNLOCK_LEVELHUD (void)
 
         oNextLevel = nextLevel;
         nextLevel = getStat(pln, STAT_NEXTL);
-        
+
         oLeft = left;
         left = unlocksLeft[pln];
 
@@ -611,13 +614,13 @@ script UNLOCK_LEVELHUD (void)
             SetFont("SMALLFONT");
             HudMessage(s:"XP: \cd", d:xp;
                 HUDMSG_FADEOUT, UNLOCK_HBASE2 + 2, CR_WHITE, 510.1, 140.2, ((HUD_REFRESH << 16) / 35) + 2.0, 2.0);
-            
+
             HudMessage(d:nextLevel;
                 HUDMSG_FADEOUT, UNLOCK_HBASE2 + 3, CR_GREEN, 555.1, 151.2, ((HUD_REFRESH << 16) / 35) + 2.0, 2.0);
-            
+
             HudMessage(s:"\cf", d:left, s:"\c- left";
                 HUDMSG_FADEOUT, UNLOCK_HBASE2 + 5, CR_TAN,  555.2, 125.2, ((HUD_REFRESH << 16) / 35) + 2.0, 2.0);
-                
+
             tic = 0;
         }
 
@@ -643,25 +646,25 @@ script UNLOCK_NAG (void)
 
             unlocksLeft[pln]--;
             unlockUnlock(pln, selected);
-        
+
             Delay(1);
         }
     }
-    
+
     SetHudSize(640, 480, 1);
-    
+
     if (nagForMenu[pln] == 1) { terminate; }
 
     if (nagForMenu[pln] == -1)
     {
         HudMessage(s:"You leveled up!";
             HUDMSG_FADEOUT, UNLOCK_HBASE2 + 50, CR_GOLD, 320.4, 30.2, 0.5, 1.0);
-        
+
         terminate;
     }
-    
+
     nagForMenu[pln] = 1;
-    
+
     while (nagForMenu[pln] == 1)
     {
         HudMessage(s:"You leveled up! Press \ck\"", k:"unlockmenu", s:"\"\c- to use it";
@@ -682,6 +685,9 @@ script UNLOCK_REGEN (void)
     int hpRate; int armRate; int clipRate; int shellRate; int rocketRate; int cellRate;
     int hpGet;  int armGet;  int clipGet;  int shellGet;  int rocketGet;  int cellGet;
 
+    int hp = GetActorProperty(0, APROP_Health);
+    int oHp;
+
     while (PlayerInGame(pln))
     {
         if (GetActorProperty(0, APROP_Health) < 0)
@@ -696,7 +702,7 @@ script UNLOCK_REGEN (void)
 
         hpRate  += hRegenRate;   hpGet  = hpRate  / HEALTH_REGENRATE;
         armRate += rRegenRate;   armGet = armRate / ARMOR_REGENRATE;
-        
+
         clipRate   += aRegenRate;   clipGet   = clipRate   / AMMO_CLIPRATE;
         shellRate  += aRegenRate;   shellGet  = shellRate  / AMMO_SHELLRATE;
         rocketRate += aRegenRate;   rocketGet = rocketRate / AMMO_ROCKETRATE;
@@ -711,27 +717,27 @@ script UNLOCK_REGEN (void)
 
         giveHealth(hpGet);
         GiveInventory("ArmorBonus", armGet);
-        
+
         GiveInventory("Clip",       clipGet);
         GiveInventory("Shell",      shellGet);
         GiveInventory("RocketAmmo", rocketGet);
         GiveInventory("Cell",       cellGet);
-        
+
         // Monitor armor class
-        
+
         aLevel = middle(0, getStat(pln, STAT_ARMORLEVEL), UNLOCK_ARMORCOUNT);
         curArm = CheckInventory("BasicArmor");
-        
+
         if (curArm > 0 && aLevel > 0)
         {
             aIndex = getArmorIndex();
-            
+
             if (aIndex < aLevel)
             {
                 TakeInventory("BasicArmor", curArm);
 
                 GiveInventory(unlockArmors[aLevel], 1);
-                
+
                 newArm = CheckInventory("BasicArmor");
                 armDif = newArm - curArm;
 
@@ -792,9 +798,9 @@ script LEVEL_RECALC (int pln)
     if (leveled)
     {
         ACS_ExecuteAlways(UNLOCK_NAG, 0, 0,0,0);
-        
+
         leveled = min(leveled, LEVELEFFECT_MAX);
-        
+
         for (i = 0; i < 70; i++)
         {
             for (j = 0; j < leveled; j++)
@@ -808,6 +814,11 @@ script LEVEL_RECALC (int pln)
 
 script LEVEL_ADDXP_ONKILL (int isMonster, int amount)
 {
+    // Laziness hook
+    ACS_ExecuteAlways(LEVEL_LOOTAMMO, 0, isMonster,0,0);
+
+    int monOldHP;
+
     int killedHP = GetActorProperty(0, APROP_SpawnHealth);
     int killedPln = PlayerNumber();
     int killedTeam = GetPlayerInfo(killedPln, PLAYERINFO_TEAM);
@@ -830,7 +841,7 @@ script LEVEL_ADDXP_ONKILL (int isMonster, int amount)
 
     if (isMonster)
     {
-        amount = (killedHP / 10) * 2;
+        amount = killedHP / 5 ;
         ACS_ExecuteAlways(LEVEL_ADDXP, 0, killerPln, amount, 0);
     }
     else
@@ -850,10 +861,11 @@ script LEVEL_ADDXP_ONKILL (int isMonster, int amount)
         }
 
         addStat(killerPln, STAT_KILLSTREAKCOUNTER, 1);
-        curStreak = getStat(killerPln, STAT_KILLSTREAKCOUNTER);
+        addStat(killerPln, STAT_KILLCOUNT, 1);
+        curStreak = getStat(killerPln, STAT_KILLCOUNT);
         Delay(105);
-        nowStreak = getStat(killerPln, STAT_KILLSTREAKCOUNTER);
-    
+        nowStreak = getStat(killerPln, STAT_KILLCOUNT);
+
         if (curStreak == nowStreak)
         {
             setStat(killerPln, STAT_KILLSTREAKCOUNTER, 0);
@@ -861,6 +873,44 @@ script LEVEL_ADDXP_ONKILL (int isMonster, int amount)
     }
 }
 
+script LEVEL_LOOTAMMO (int isMonster)
+{
+    int kHp     = GetActorProperty(0, APROP_SpawnHealth);int kHp = GetActorProperty(0, APROP_SpawnHealth)
+    int kClip   = CheckInventory("Clip");
+    int kShell  = CheckInventory("Shell");
+    int kRocket = CheckInventory("RocketAmmo");
+    int kCell   = CheckInventory("Cell");
+    
+  
+    SetActivatorToTarget(0);
+
+    int aPln   = PlayerNumber();
+    int aLevel = getStat(aPln, STAT_AMMOLEECHLEVEL);
+
+    if (isMonster)
+    {
+         kHp *= aLevel;
+        
+        kClip   = kHp / 20;
+        kShell  = kHp / 100;
+        kRocket = kHp / 150;
+        kCell   = kHp / 30;
+    }
+    else
+    {
+        aLevel *= 0.2;
+
+        kClip = FixedMul(kClip, aLevel) >> 16;
+        kShell = FixedMul(kShell, aLevel) >> 16;
+        kRocket = FixedMul(kRocket, aLevel) >> 16;
+        kCell = FixedMul(kCell, aLevel) >> 16;
+    }
+
+    GiveInventory("Clip", kClip);
+    GiveInventory("Shell", kShell);
+    GiveInventory("RocketAmmo", kRocket);
+    GiveInventory("Cell", kCell);
+}
 
 script GENERAL_ACTIVATE (int which)
 {
@@ -892,7 +942,7 @@ script GENERAL_ACTIVATE (int which)
         int bestNewWeapon;
 
         int weps = getStat(pln, STAT_WEPS);
-        
+
         for (i = 0; i < UNLOCK_WEPCOUNT; i++)
         {
             cBit   = pow(2, i);
@@ -923,7 +973,7 @@ script GENERAL_ACTIVATE (int which)
             SetWeapon(bestNewWeapon);
         }
         break;
-    
+
     case 9:
         switch (getStat(pln, STAT_RUNELEVEL))
         {
@@ -1015,13 +1065,17 @@ script GENERAL_UNLOCK (int which, int a1, int a2)
         weps = getStat(pln, STAT_WEPS);
         setStat(pln, STAT_WEPS, weps | pow(2, a1));
         break;
-    
+
     case 8:
         addStat(pln, STAT_ARMORLEVEL, a1);
         break;
 
     case 9:
         addStat(pln, STAT_RUNELEVEL, a1);
+        break;
+
+    case 10:
+        addStat(pln, STAT_AMMOLEECHLEVEL, a1);
         break;
     }
     ACS_ExecuteAlways(GENERAL_ACTIVATE, 0, which, a1, a2);
@@ -1054,7 +1108,7 @@ script GENERAL_CHECK (int which, int a1, int a2)
         if (getUnlock(pln, check) < a2)
         {
             diff = a2 - getUnlock(pln, check);
-            
+
             if (diff != 1)
             {
                 addS = "s";
@@ -1097,7 +1151,7 @@ script SCALED_CHECK (int base, int check, int scale)
     if (getUnlock(pln, check) < necessaryLevel)
     {
         diff = necessaryLevel - getUnlock(pln, check);
-        
+
         if (diff != 1)
         {
             addS = "s";
@@ -1148,7 +1202,7 @@ script PUKE_REPORT (void)
         {
             used += getUnlock(i, j);
         }
-        
+
         left = unlocksLeft[i];
         level = getStat(i, STAT_LEVEL);
         xp    = getStat(i, STAT_XP);

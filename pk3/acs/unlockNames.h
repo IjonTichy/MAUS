@@ -22,6 +22,7 @@
 
 #define LEVEL_ADDXP             UNLOCK_BASE+31
 #define LEVEL_RECALC            UNLOCK_BASE+32
+#define LEVEL_LOOTAMMO          UNLOCK_BASE+38
 #define LEVEL_ADDXP_ONKILL      UNLOCK_BASE+39
 
 #define PUKE_UNLOCKANDUSE       UNLOCK_BASE+51
@@ -36,7 +37,7 @@
 #define MENU_SIZE           10
 #define MENU_SPACING        11.0
 
-#define XPQ_A               12.5 
+#define XPQ_A               12.5
 #define XPQ_B               37.5
 #define XPQ_C               0
 
@@ -48,8 +49,8 @@
 #define HEALTH_REGENRATE    61
 #define ARMOR_REGENRATE     81
 
-// BEHOLD! A way to cram too many values into one global array!
-#define STAT_COUNT              14
+// BEHOLD! A way to cram a ludicrous amount of values into one global array!
+#define STAT_COUNT              15
 
 #define STAT_HP                 0
 #define STAT_SPEED              1
@@ -65,3 +66,5 @@
 #define STAT_ARMORLEVEL         11
 #define STAT_RUNELEVEL          12
 #define STAT_KILLSTREAKCOUNTER  13
+#define STAT_KILLCOUNT          14
+#define STAT_AMMOLEECHLEVEL     15
