@@ -24,6 +24,7 @@
 #define LEVEL_RECALC            UNLOCK_BASE+32
 #define LEVEL_LOOTAMMO          UNLOCK_BASE+38
 #define LEVEL_ADDXP_ONKILL      UNLOCK_BASE+39
+#define LEVEL_EXTRA_ONKILL      UNLOCK_BASE+40
 
 #define PUKE_UNLOCKANDUSE       UNLOCK_BASE+51
 #define PUKE_REPORT             UNLOCK_BASE+52
@@ -50,7 +51,7 @@
 #define ARMOR_REGENRATE     81
 
 // BEHOLD! A way to cram a ludicrous amount of values into one global array!
-#define STAT_COUNT              15
+#define STAT_COUNT              16
 
 #define STAT_HP                 0
 #define STAT_SPEED              1
