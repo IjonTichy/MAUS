@@ -8,8 +8,10 @@
 
 global int 3:inGame[];
 global int 4:unlocksLeft[];
-global int 5:startStats[];
 global int 6:unlocksPerPlayer[];
+
+// Layout: [hp, speed, jumpz, level, xp, next levelup, weapons, ...]
+global int 5:startStats[];
 
 int uMenuLock[32];
 int hasEntered[32];
@@ -313,12 +315,31 @@ script UNLOCK_ENTER enter
             setStat(pln, STAT_HP, 100);
             SetActorProperty(0, APROP_SpawnHealth, 100);
         }
-        
-        ACS_ExecuteAlways(UNLOCK_HOOK_ENTER, 0, 0,0,0);
+
+        setStat(pln, STAT_SPEED, GetActorProperty(0, APROP_Speed));
+        setStat(pln, STAT_JUMPZ, GetActorProperty(0, APROP_JumpZ));
+        setStat(pln, STAT_LEVEL, 1);
+        setStat(pln, STAT_NEXTL, 50);
+
+        for (i = 0; i < UNLOCK_WEPCOUNT; i++)
+        {
+            wepName = unlockWeapons[i];
+
+            if (CheckInventory(wepName))
+            {
+                weps |= pow(2, i);
+            }
+        }
+        setStat(pln, STAT_WEPS, weps);
+
+        for (i = 0; i < UNLOCK_COUNT; i++)
+        {
+            setUnlock(pln, i, 0);
+        }
     }
 
     ACS_ExecuteAlways(UNLOCK_LEVELHUD, 0, 0,0,0);
-    ACS_ExecuteAlways(UNLOCK_HOOK_DAEMON, 0, 0,0,0);
+    ACS_ExecuteAlways(UNLOCK_REGEN, 0, 0,0,0);
 }
 
 script UNLOCK_RESPAWN respawn
@@ -340,8 +361,6 @@ script UNLOCK_RESPAWN respawn
     {
         applyUnlock(pln, i);
     }
-
-    ACS_ExecuteAlways(UNLOCK_HOOK_RESPAWN, 0, 0,0,0);
 }
 
 script UNLOCK_DISCONNECT (int pln) disconnect
@@ -731,7 +750,7 @@ script LEVEL_RECALC (int pln)
 
 script LEVEL_ADDXP_ONKILL (int isMonster, int amount)
 {
-    ACS_ExecuteAlways(UNLOCK_HOOK_ONKILL, 0, isMonster,amount,0);
+    ACS_ExecuteAlways(LEVEL_EXTRA_ONKILL, 0, isMonster,amount,0);
 
     int monOldHP;
 
@@ -767,7 +786,7 @@ script LEVEL_ADDXP_ONKILL (int isMonster, int amount)
     }
     else
     {
-        amount *= getStat(killerPln, STAT_CURSTREAK) + 1;
+        amount *= getStat(killerPln, STAT_KILLSTREAKCOUNTER) + 1;
 
         if (killedTeam == killerTeam)
         {
@@ -781,7 +800,7 @@ script LEVEL_ADDXP_ONKILL (int isMonster, int amount)
             ACS_ExecuteAlways(LEVEL_ADDXP, 0, killerPln, amount, 0);
         }
 
-        addStat(killerPln, STAT_CURSTREAK, 1);
+        addStat(killerPln, STAT_KILLSTREAKCOUNTER, 1);
         addStat(killerPln, STAT_KILLCOUNT, 1);
         curStreak = getStat(killerPln, STAT_KILLCOUNT);
         Delay(105);
@@ -789,7 +808,7 @@ script LEVEL_ADDXP_ONKILL (int isMonster, int amount)
 
         if (curStreak == nowStreak)
         {
-            setStat(killerPln, STAT_CURSTREAK, 0);
+            setStat(killerPln, STAT_KILLSTREAKCOUNTER, 0);
         }
     }
 }
