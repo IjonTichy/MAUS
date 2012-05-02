@@ -48,7 +48,7 @@
 
 #define STAT_IRONMAN        7
 #define STAT_HELLRUNNER     8
-#define STAT_JUMPMAZ        9
+#define STAT_JUMPMAN        9
 #define STAT_SONOFABITCH    10
 #define STAT_TOUGHASNAILS   11
 

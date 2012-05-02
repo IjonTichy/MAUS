@@ -302,6 +302,10 @@ script UNLOCK_ENTER enter
             setStat(pln, i, 0);
         }
 
+        setStat(pln, STAT_LEVEL, 1);
+        setStat(pln, STAT_NEXTL, 250);
+        unlocksLeft[pln] = 1;
+
         hp = GetActorProperty(0, APROP_SpawnHealth);
 
         if (hp != 0)
@@ -537,26 +541,26 @@ script UNLOCK_MENU (int alwaysShow)
             if (selected == UNLOCK_COUNT)
             {
                 HudMessage(s:"";
-                    HUDMSG_FADEOUT, UNLOCK_HBASE - 8, CR_BRICK, 480.4, 240.1, ((MENU_REFRESH << 16) / 35) + 2.0, 2.0);
+                    HUDMSG_FADEOUT, UNLOCK_HBASE - 8, CR_BRICK, 440.4, 240.1, ((MENU_REFRESH << 16) / 35) + 2.0, 2.0);
 
                 HudMessage(s:"";
-                    HUDMSG_FADEOUT, UNLOCK_HBASE - 9, CR_BRICK, 480.4, 240.1, ((MENU_REFRESH << 16) / 35) + 2.0, 2.0);
+                    HUDMSG_FADEOUT, UNLOCK_HBASE - 9, CR_BRICK, 440.4, 240.1, ((MENU_REFRESH << 16) / 35) + 2.0, 2.0);
             }
             else
             {
                 if (unlockQuotes[selected] != "")
                 {
                     HudMessage(s:"\"", s:unlockQuotes[selected], s:"\"";
-                        HUDMSG_FADEOUT, UNLOCK_HBASE - 8, CR_GOLD, 480.4, 250.1, ((MENU_REFRESH << 16) / 35) + 2.0, 2.0);
+                        HUDMSG_FADEOUT, UNLOCK_HBASE - 8, CR_GOLD, 440.4, 250.1, ((MENU_REFRESH << 16) / 35) + 2.0, 2.0);
                 }
                 else
                 {
                     HudMessage(s:"";
-                        HUDMSG_FADEOUT, UNLOCK_HBASE - 8, CR_GOLD, 480.4, 250.1, ((MENU_REFRESH << 16) / 35) + 2.0, 2.0);
+                        HUDMSG_FADEOUT, UNLOCK_HBASE - 8, CR_GOLD, 440.4, 250.1, ((MENU_REFRESH << 16) / 35) + 2.0, 2.0);
                 }
 
                 HudMessage(s:unlockDescriptions[selected];
-                    HUDMSG_FADEOUT, UNLOCK_HBASE - 9, CR_BRICK, 480.4, 265.1, ((MENU_REFRESH << 16) / 35) + 2.0, 2.0);
+                    HUDMSG_FADEOUT, UNLOCK_HBASE - 9, CR_BRICK, 440.4, 265.1, ((MENU_REFRESH << 16) / 35) + 2.0, 2.0);
             }
 
             for (i = 0; i < min(MENU_SIZE, UNLOCK_COUNT); i++)
