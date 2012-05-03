@@ -1,5 +1,15 @@
 #define UNLOCK_MENU        471
 #define LEVEL_ADDXP        481
 #define LEVEL_ADDXP_ONKILL 489
+#define DOOMRL_GETSTAT     435
+#define DOOMRL_DAMAGE      436
+#define DOOMRL_ACCURACY    434
+
+#define STAT_IRONMAN        7
+#define STAT_HELLRUNNER     8
+#define STAT_JUMPMAN        9
+#define STAT_SONOFABITCH    10
+#define STAT_TOUGHASNAILS   11
+#define STAT_SONOFAGUN      12
 
 #include {decorate}

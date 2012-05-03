@@ -1,0 +1,15 @@
+actor PowerTaN: PowerProtection
+{
+    DamageFactor "Normal", 0.8
+}
+
+actor PowerTaN1:  PowerTaN {}
+actor PowerTaN2:  PowerTaN {}
+actor PowerTaN3:  PowerTaN {}
+actor PowerTaN4:  PowerTaN {}
+actor PowerTaN5:  PowerTaN {}
+actor PowerTaN6:  PowerTaN {}
+actor PowerTaN7:  PowerTaN {}
+actor PowerTaN8:  PowerTaN {}
+actor PowerTaN9:  PowerTaN {}
+actor PowerTaN10: PowerTaN {}

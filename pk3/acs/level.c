@@ -709,7 +709,7 @@ script LEVEL_RECALC (int pln)
         leveled++;
         unlocksLeft[pln]++;
 
-        next += 25;
+        next += 100;
     }
 
     setStat(pln, STAT_XP, xp);

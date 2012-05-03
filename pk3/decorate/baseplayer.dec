@@ -1,7 +1,7 @@
 actor UnlockPlayer: DoomPlayer 
 {
     Player.StartItem "MAUSMenu"
-    Player.StartItem "Pistol"
+    Player.StartItem "Basic Pistol"
     Player.StartItem "Clip", 50
     Player.StartItem "Fist"
 
@@ -34,7 +34,7 @@ actor XPGiver: CustomInventory
     States
     {
       Pickup:
-        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP, 0, -1, 10000, 0)
+        TNT1 A 0 ACS_ExecuteAlways($LEVEL_ADDXP, 0, -1, 1000000, 0)
         stop
     }
 }

@@ -1,3 +1,25 @@
+function int round(int x)
+{
+    int y = x >> 16;
+    if (x - (y << 16) >= 0.5) { return y + 1; }
+    return y;
+}
+
+function int floatIntg(int x)
+{
+    return (x >> 16);
+}
+
+function int floatFrac(int x)
+{
+    return (x << 16) >> 16;
+}
+
+function int percFrac(int x)
+{
+    x = floatFrac(x);
+    return floatIntg(x * 100);
+}
 
 function int abs(int x)
 {

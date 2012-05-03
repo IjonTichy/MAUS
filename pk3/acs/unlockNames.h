@@ -35,7 +35,7 @@
 #define UNLOCK_HOOK_ONKILL     UNLOCK_BASE + 104
 
 // Stats
-#define STAT_COUNT  12
+#define STAT_COUNT  14
 
 // !!! REQUIRED
 #define STAT_LEVEL      0
@@ -51,6 +51,8 @@
 #define STAT_JUMPMAN        9
 #define STAT_SONOFABITCH    10
 #define STAT_TOUGHASNAILS   11
+#define STAT_SONOFAGUN      12
+#define STAT_EAGLEEYE       13
 
 
 // Non-core scripts
@@ -58,3 +60,7 @@
 #define DOOMRL_GENERAL_APPLY    UNLOCK_BASE - 11
 #define DOOMRL_GENERAL_UNLOCK   UNLOCK_BASE - 12
 #define DOOMRL_GENERAL_CHECK    UNLOCK_BASE - 13
+
+#define DOOMRL_DAMAGE           UNLOCK_BASE - 14
+#define DOOMRL_GETSTAT          UNLOCK_BASE - 15
+#define DOOMRL_ACCURACY         UNLOCK_BASE - 16
