@@ -109,6 +109,11 @@ script DOOMRL_GENERAL_UNLOCK (int which, int a1, int a2)
     ACS_ExecuteAlways(DOOMRL_GENERAL_APPLY, 0, which, a1, a2);
 }
 
+/// Weapon type:
+//
+// 1 = Pistol
+// 2 = Shotgun
+
 script DOOMRL_DAMAGE (int base, int wepType)
 {
     int ret = base << 16;
@@ -122,10 +127,10 @@ script DOOMRL_DAMAGE (int base, int wepType)
 
     switch (wepType)
     {
-    case 0: // Non-special case
+    case 0: // What /is/ this strange device?
         break;
 
-    case 1: // Pistol
+    case 1:
        ret = FixedMul(ret, powFloat(1.35, soagLevel));
        break;
     }

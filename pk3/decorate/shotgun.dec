@@ -1,0 +1,42 @@
+actor "Basic Shotgun": Weapon replaces Shotgun
+{
+    Weapon.AmmoUse 1
+    Weapon.AmmoGive 8
+    Weapon.AmmoType "Shell"
+
+    Weapon.Kickback 100
+
+    Inventory.PickupMessage "$GOTSHOTGUN" // "You got the shotgun!"
+    Obituary "$OB_MPSHOTGUN" // "%o chewed on %k's boomstick."
+
+    States
+    {
+      Ready:
+        SHTG A 1 A_WeaponReady
+        Loop
+
+      Deselect:
+        SHTG A 1 A_Lower
+        Loop
+
+      Select:
+        SHTG A 1 A_Raise
+        Loop
+
+      Fire:
+        PISG B 0 A_FireBullets(ACS_ExecuteWithResult($DOOMRL_ACCURACY, 7,00,2)/100.0, ACS_ExecuteWithResult($DOOMRL_ACCURACY, 2,00,2)/100.0, 7, ACS_ExecuteWithResult($DOOMRL_DAMAGE, 5,2,0) )
+        SHTG A 0 A_PlaySound ("weapons/shotgf", CHAN_WEAPON)
+        SHTG A 7 A_GunFlash
+        SHTG BCDCB 5
+        SHTG A 5
+        SHTG A 0 A_ReFire
+        Goto Ready
+      Flash:
+        SHTF A 4 Bright A_Light1
+        SHTF B 3 Bright A_Light2
+        Goto LightDone
+      Spawn:
+        SHOT A -1
+        Stop
+    }
+}

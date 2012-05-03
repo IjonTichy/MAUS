@@ -681,6 +681,7 @@ script UNLOCK_NAG (void)
         Delay(35);
     }
 }
+
 script LEVEL_ADDXP (int pln, int addXP)
 {
     if (pln == -1)
@@ -709,7 +710,7 @@ script LEVEL_RECALC (int pln)
         leveled++;
         unlocksLeft[pln]++;
 
-        next += 100;
+        next += (next >> 2);
     }
 
     setStat(pln, STAT_XP, xp);
