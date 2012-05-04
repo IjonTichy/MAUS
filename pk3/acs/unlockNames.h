@@ -35,7 +35,6 @@
 #define UNLOCK_HOOK_ONKILL     UNLOCK_BASE + 104
 
 // Stats
-#define STAT_COUNT  14
 
 // !!! REQUIRED
 #define STAT_LEVEL      0
@@ -45,6 +44,7 @@
 #define STAT_CURSTREAK  4
 #define STAT_KILLCOUNT  5
 #define STAT_HP         6
+// Not required
 
 #define STAT_IRONMAN        7
 #define STAT_HELLRUNNER     8
@@ -53,6 +53,9 @@
 #define STAT_TOUGHASNAILS   11
 #define STAT_SONOFAGUN      12
 #define STAT_EAGLEEYE       13
+#define STAT_SHOTTYMAN      14
+
+#define STAT_COUNT  15
 
 
 // Non-core scripts

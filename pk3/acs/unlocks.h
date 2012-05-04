@@ -1,6 +1,6 @@
 //#include "unlockNames.h"
 
-#define UNLOCK_COUNT        7
+#define UNLOCK_COUNT        8
 #define ENTRY_COUNT         14
 #define UNLOCK_ARMORCOUNT   3
 #define UNLOCK_WEPCOUNT     13
@@ -34,6 +34,7 @@ int unlockables[UNLOCK_COUNT][ENTRY_COUNT] =
     {DOOMRL_GENERAL_APPLY, 4,0,0,   DOOMRL_GENERAL_UNLOCK, 4,1,0,   3,  -1, 0,0,0,  1},
     {DOOMRL_GENERAL_APPLY, 5,0,0,   DOOMRL_GENERAL_UNLOCK, 5,1,0,   3,  -1, 0,0,0,  1},
     {DOOMRL_GENERAL_APPLY, 6,0,0,   DOOMRL_GENERAL_UNLOCK, 6,1,0,   3,  -1, 0,0,0,  1},
+    {DOOMRL_GENERAL_APPLY, 7,0,0,   DOOMRL_GENERAL_UNLOCK, 7,1,0,   3,  -1, 0,0,0,  1},
 };
 
 // This is in a seperate array because of ACS bugginess
@@ -46,6 +47,7 @@ int unlockNames[UNLOCK_COUNT] =
     "Tough as Nails",
     "Son of a Gun",
     "Eagle Eye",
+    "Shottyman",
 };
 
 // Line length should be max 50 chars
@@ -94,7 +96,14 @@ damage, and fire faster.",
 "You could pick off a fly at 200 yards with a\n\
 double-barreled shotgun, if you ever felt the\n\
 need to. With any weapon that spreads, its spread\n\
-will decrease by 20% per level."
+will decrease by 20% per level.",
+// Shottyman
+"This isn't quite DoomRL. You can already pump\n\
+while moving, and since no other weapon needs to\n\
+be reloaded, instead, every level of this trait\n\
+will speed up your shotgun reloading/pumping\n\
+dramatically, as well as give you a 5% damage\n\
+boost.",
 };
 
 int unlockQuotes[UNLOCK_COUNT] =
@@ -106,6 +115,7 @@ int unlockQuotes[UNLOCK_COUNT] =
     "Imps? Zombies? You think you can get me?",
     "<quote>",
     "The maximum range is my minimum range.",
+    "<quote>"
 };
 
 int unlockArmors[UNLOCK_ARMORCOUNT] =

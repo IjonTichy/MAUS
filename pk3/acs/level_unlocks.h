@@ -68,6 +68,8 @@ script DOOMRL_GENERAL_APPLY (int which, int a1, int a2)
     case 5: // Son of a Gun
     case 6: // Eagle Eye
         break;
+    case 7: // Shottyman
+        break;
     }
 }
 
@@ -82,7 +84,7 @@ script DOOMRL_GENERAL_UNLOCK (int which, int a1, int a2)
         break;
 
     case 1: // Hellrunner
-        addStat(pln, STAT_HELLRUNNER, a1);
+        addStat(pln, STAT_HELLRUNNER, a2);
         break;
 
     case 2: // Jumpman
@@ -103,6 +105,10 @@ script DOOMRL_GENERAL_UNLOCK (int which, int a1, int a2)
 
     case 6: // Eagle Eye
         addStat(pln, STAT_EAGLEEYE, a1);
+        break;
+
+    case 7: // Shottyman
+        addStat(pln, STAT_SHOTTYMAN, a1);
         break;
     }
 
@@ -132,6 +138,10 @@ script DOOMRL_DAMAGE (int base, int wepType)
 
     case 1:
        ret = FixedMul(ret, powFloat(1.35, soagLevel));
+       break;
+
+    case 2:
+       ret = FixedMul(ret, powFloat(1.05, soagLevel));
        break;
     }
 

@@ -11,5 +11,7 @@
 #define STAT_SONOFABITCH    10
 #define STAT_TOUGHASNAILS   11
 #define STAT_SONOFAGUN      12
+#define STAT_EAGLEEYE       13
+#define STAT_SHOTTYMAN      14
 
 #include {decorate}
